@@ -2,13 +2,20 @@
 <html>
 	<head>
 		<title>My Restaurant</title>
-			
-		<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 		
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+		<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+		<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+		<link rel="stylesheet" href="/resources/demos/style.css">
+		<script>
+			$(function() {
+				$( "#tabs" ).tabs();
+			});
+		</script>
 		<?php 
 			// Database log-in information
-			$databaseUserName="<Username>";
-			$databasePassword="<Password>";
+			$databaseUserName="<UserName e.g.: ora_a1a1>";
+			$databasePassword="<Password e.g.: a12345678>";
 			
 			$success = True; //keep track of errors so it redirects the page only if there are no errors
 			$db_conn = OCILogon($databaseUserName, $databasePassword, "ug");
@@ -28,16 +35,27 @@
 		<input type="submit" value="Reset Database" name="reset"></p>
 	</form>
 	
+	<!--Tabbed interface-->
+	<div id="tabs">
+		<ul>
+			<li><a href="#tab-Member">Member</a></li>
+			<li><a href="#tab-Dish">Dish</a></li>
+			<li><a href="#tab-Sale">Sale</a></li>
+			<li><a href="#tab-Restaurant">Restaurant</a></li>
+		</ul>
+	
+	
+	
 	<!--Member-->
-	<h2>Member</h2>
+	<div id="tab-Member">
 	<form method="POST" action="myRestaurant.php"> <!-- Member form-->
-		<p>
+		
 		<input type="text" name="memberID" size="6" placeholder="ID">
 		<input type="text" name="memberName" size="6" placeholder="Name">
 		<input type="text" name="memberPhone" size="6" placeholder="Phone #">
 		<input type="text" name="memberAddress" size="6" placeholder="Address">
 		<input type="text" name="memberDiscount" size="6" placeholder="Discount rate">
-		<input type="submit" value="Add Member" name="addMember"></p>
+		<input type="submit" value="Add Member" name="addMember">
 	</form>
 	<?php
 		function generateMemberDisplay() {
@@ -63,25 +81,34 @@
 		}
 	?>
 	<div id="memberDisplay"></div> <!-- Member display area-->
-		
+	</div>
+	
+	
 	<!--Dish-->
-	<h2>Dish</h2>
+	<div id="tab-Dish">
+		Content for dish
+	</div>
 	
 	
 	<!--Sale-->
-	<h2>Sale</h2>
+	<div id="tab-Sale">
+		Content for sale
+	</div>
 	
 	
 	<!--Restaurant-->
-	<h2>Restaurant</h2>
+	<div id="tab-Restaurant">
+		Content for Restaurant
+	</div>
 	
 	<!-- (Other tables...) -->
 
 	
+	</div>
+	
+	
 	
 	<?php
-		
-	
 		// !!!!!!!!!!!!!!!!!!!!!!! Everyone: don't worry about the implementation of executePlainSQL and executeBoundSQL, just use it! !!!!!!!!!!!!!!!!!!!!!!!!
 		function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
 			//echo "<br>running ".$cmdstr."<br>";
