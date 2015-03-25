@@ -31,7 +31,7 @@
 	
 	<body>
 	<!--The Reset Button-->
-	<form method="POST" action="myRestaurant.php">
+	<form method="POST">
 		<input type="submit" value="Reset Database" name="reset"></p>
 	</form>
 	
@@ -44,45 +44,42 @@
 			<li><a href="#tab-Restaurant">Restaurant</a></li>
 		</ul>
 	
-	
-	
 	<!--Member-->
 	<div id="tab-Member">
-	<form method="POST" action="myRestaurant.php"> <!-- Member form-->
+		<form method="POST"> <!-- Member form-->
 		
-		<input type="text" name="memberID" size="6" placeholder="ID">
-		<input type="text" name="memberName" size="6" placeholder="Name">
-		<input type="text" name="memberPhone" size="6" placeholder="Phone #">
-		<input type="text" name="memberAddress" size="6" placeholder="Address">
-		<input type="text" name="memberDiscount" size="6" placeholder="Discount rate">
-		<input type="submit" value="Add Member" name="addMember">
-	</form>
-	<?php
-		function generateMemberDisplay() {
-			$toDisplay = "";
-			$result = executePlainSQL("select * from member");
+			<input type="text" name="memberID" size="6" placeholder="ID">
+			<input type="text" name="memberName" size="6" placeholder="Name">
+			<input type="text" name="memberPhone" size="6" placeholder="Phone #">
+			<input type="text" name="memberAddress" size="6" placeholder="Address">
+			<input type="text" name="memberDiscount" size="6" placeholder="Discount rate">
+			<input type="submit" value="Add Member" name="addMember">
+		</form>
+		<?php
+			function generateMemberDisplay() {
+				$toDisplay = "";
+				$result = executePlainSQL("select * from member");
 			
-			$toDisplay = $toDisplay."<table border='1' width='100%'>";
-			$toDisplay = $toDisplay."<tr><td>ID</td><td>Name</td><td>Phone</td><td>Address</td><td>Discount Rate</td></tr>";
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<tr><td>ID</td><td>Name</td><td>Phone</td><td>Address</td><td>Discount Rate</td></tr>";
 			
 			
-			while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-				$toDisplay = $toDisplay."<tr>";
-				$toDisplay = $toDisplay."<td>".$row["MEMBERID"]."</td>";
-				$toDisplay = $toDisplay."<td>".$row["MEMBERNAME"]."</td>";
-				$toDisplay = $toDisplay."<td>".$row["MEMBERPHONE"]."</td>";
-				$toDisplay = $toDisplay."<td>".$row["MEMBERADDRESS"]."</td>";
-				$toDisplay = $toDisplay."<td>".$row["MEMBERDISCOUNT"]."</td>";
-				$toDisplay = $toDisplay."</tr>";
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<td>".$row["MEMBERID"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["MEMBERNAME"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["MEMBERPHONE"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["MEMBERADDRESS"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["MEMBERDISCOUNT"]."</td>";
+					$toDisplay = $toDisplay."</tr>";
+				}
+				$toDisplay = $toDisplay."</table>";
+			
+				return $toDisplay;
 			}
-			$toDisplay = $toDisplay."</table>";
-			
-			return $toDisplay;
-		}
-	?>
-	<div id="memberDisplay"></div> <!-- Member display area-->
+		?>
+		<div id="memberDisplay"></div> <!-- Member display area-->
 	</div>
-	
 	
 	<!--Dish-->
 	<div id="tab-Dish">
@@ -98,7 +95,35 @@
 	
 	<!--Restaurant-->
 	<div id="tab-Restaurant">
-		Content for Restaurant
+		<form method="POST"> <!-- Member form-->
+		
+			<input type="text" name="restaurantPhone" size="6" placeholder="Phone #">
+			<input type="text" name="restaurantName" size="6" placeholder="Restaurant Name">
+			<input type="text" name="restaurantLocation" size="6" placeholder="Address">
+			<input type="submit" value="Add Restaurant" name="addRestaurant">
+		</form>
+		<?php
+			function generateRestaurantDisplay() {
+				$toDisplay = "";
+				$result = executePlainSQL("select * from restaurant");
+			
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<tr><td>Phone</td><td>Name</td><td>Address</td></tr>";
+			
+			
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<td>".$row["RESTAURANTPHONE"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["RESTAURANTNAME"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["RESTAURANTLOCATION"]."</td>";
+					$toDisplay = $toDisplay."</tr>";
+				}
+				$toDisplay = $toDisplay."</table>";
+			
+				return $toDisplay;
+			}
+		?>
+		<div id="restaurantDisplay"></div> <!-- Member display area-->
 	</div>
 	
 	<!-- (Other tables...) -->
@@ -174,15 +199,23 @@
 		if ($db_conn) { //if connection successful
 			if (array_key_exists('reset', $_POST)) { //If reset button clicked
 				// Drop old table...
-				executePlainSQL("Drop table member");
-			
-
+				executePlainSQL("Drop table member cascade constraints");
+				executePlainSQL("Drop table restaurant cascade constraints");
+				executePlainSQL("Drop table likes cascade constraints");
+				executePlainSQL("Drop table registered cascade constraints");
+				
+				executePlainSQL("Drop table dish");
+				
 				// Create new table...
 				executePlainSQL("create table member (memberID number, memberName varchar2(30), memberPhone number, memberAddress char(50), memberDiscount number, primary key (memberID))");
-			
+				executePlainSQL("create table restaurant (restaurantPhone number, restaurantName varchar2(30), restaurantLocation varchar2(20), primary key (restaurantPhone))");
+				executePlainSQL("create table dish (dishID number, primary key (dishID))"); // TODO
+				executePlainSQL("create table likes (memberID number, dishID number, primary key (memberID, dishID), foreign key(memberID) references member, foreign key (dishID) references dish)");
+				executePlainSQL("create table registered (memberID number, restaurantPhone number, primary key (memberID), foreign key (memberID) references member, foreign key (restaurantPhone) references restaurant)");
+				
 				// save database
 				OCICommit($db_conn);
-			
+				
 			} elseif (array_key_exists('addMember', $_POST)) { //If addMember button clicked
 				$tuple = array ( //generate a new tuple
 					":bind1" => $_POST['memberID'],
@@ -196,7 +229,17 @@
 				);
 				executeBoundSQL("insert into member values (:bind1, :bind2, :bind3, :bind4, :bind5)", $alltuples);
 				OCICommit($db_conn);
-			
+			} elseif (array_key_exists('addRestaurant', $_POST)){
+				$tuple = array ( //generate a new tuple
+					":bind1" => $_POST['restaurantPhone'],
+					":bind2" => $_POST['restaurantName'],
+					":bind3" => $_POST['restaurantLocation']
+				);
+				$alltuples = array ( //wrap the tuple into an array
+					$tuple
+				);
+				executeBoundSQL("insert into restaurant values (:bind1, :bind2, :bind3)", $alltuples);
+				OCICommit($db_conn);
 			} else { //If the page is just loaded
 				//Nothing for now
 			}
@@ -207,6 +250,8 @@
 		//this part of the code is to fill in the display areas.
 		
 		$("#memberDisplay").html("<?php echo generateMemberDisplay(); ?>");
+		$("#restaurantDisplay").html("<?php echo generateRestaurantDisplay(); ?>");
+		
 	</script>
 </body>
 </html>
