@@ -333,6 +333,7 @@
 				executePlainSQL("Drop table TPworks cascade constraints");
 				executePlainSQL("Drop table employee cascade constraints");
 				executePlainSQL("Drop table employs cascade constraints");
+				executePlainSQL("Drop table sale cascade constraints");
 				
 				
 				// Create new table...
@@ -344,7 +345,9 @@
 				executePlainSQL("create table employs (restaurantPhone number, employeeID number, startDate varchar2(10), primary key(restaurantPhone,employeeID),foreign key (restaurantPhone) references restaurant, foreign key(employeeID) references TPworks)");
  				executePlainSQL("create table likes (memberID number, dishID number, primary key (memberID, dishID), foreign key(memberID) references member, foreign key (dishID) references dish)");
 				executePlainSQL("create table registered (memberID number, restaurantPhone number, primary key (memberID), foreign key (memberID) references member, foreign key (restaurantPhone) references restaurant)");
-				
+				executePlainSQL("create table sale (saleID number, paymentMethod varchar2(10), discount double");
+			
+
 				// save database
 				OCICommit($db_conn);
 				
@@ -400,6 +403,17 @@
 					":bind1" => $_POST['employeeID'],
 					":bind2" => $_POST['empName'],
 					":bind3" => $_POST['empSalary']
+				);
+				$alltuples = array ( //wrap the tuple into an array
+					$tuple
+				);
+				executeBoundSQL("insert into Employee values (:bind1, :bind2, :bind3)", $alltuples);
+				OCICommit($db_conn);
+			} elseif (array_key_exists('addSale', $_POST)){
+				$tuple = array ( //generate a new tuple
+					":bind1" => $_POST['saleID'],
+					":bind2" => $_POST['paymentMethod'],
+					":bind3" => $_POST['discount']
 				);
 				$alltuples = array ( //wrap the tuple into an array
 					$tuple
