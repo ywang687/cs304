@@ -345,7 +345,7 @@
 				executePlainSQL("create table employs (restaurantPhone number, employeeID number, startDate varchar2(10), primary key(restaurantPhone,employeeID),foreign key (restaurantPhone) references restaurant, foreign key(employeeID) references TPworks)");
  				executePlainSQL("create table likes (memberID number, dishID number, primary key (memberID, dishID), foreign key(memberID) references member, foreign key (dishID) references dish)");
 				executePlainSQL("create table registered (memberID number, restaurantPhone number, primary key (memberID), foreign key (memberID) references member, foreign key (restaurantPhone) references restaurant)");
-				executePlainSQL("create table sale (saleID number, paymentMethod varchar2(10), discount double");
+				executePlainSQL("create table sale (saleID number, paymentMethod varchar2(10), discount number");
 			
 
 				// save database
