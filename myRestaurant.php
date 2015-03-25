@@ -14,8 +14,8 @@
 		</script>
 		<?php 
 			// Database log-in information
-			$databaseUserName="a1a1";
-			$databasePassword="a1234567";
+			$databaseUserName="ora_u5n8";
+			$databasePassword="a40227118";
 			
 			$success = True; //keep track of errors so it redirects the page only if there are no errors
 			$db_conn = OCILogon($databaseUserName, $databasePassword, "ug");
@@ -42,6 +42,8 @@
 			<li><a href="#tab-Dish">Dish</a></li>
 			<li><a href="#tab-Sale">Sale</a></li>
 			<li><a href="#tab-Restaurant">Restaurant</a></li>
+			<li><a href="#tab-TPworks">TPworks</a></li>
+			<li><a href="#tab-Employee">Employee</a></li>
 		</ul>
 	
 	<!--Member-->
@@ -97,7 +99,7 @@
 				$result = executePlainSQL("select * from dish");
 			
 				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<tr><td>dID</td><td>dName</td><td>Style</td><td>Price</td></tr>";
+				$toDisplay = $toDisplay."<tr><td>Dish ID</td><td>Dish Name</td><td>Style</td><td>Price</td></tr>";
 			
 			
 				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
@@ -148,6 +150,72 @@
 			}
 		?>
 		<div id="restaurantDisplay"></div> <!-- Restaurant display area-->
+	</div>
+	
+		<!--TPworks-->
+	<div id="tab-TPworks">
+			<form method="POST"> <!-- TPworks form-->
+		
+			<input type="text" name="employeeID" size="6" placeholder="empID">
+			<input type="text" name="startDate" size="6" placeholder="sDate">
+			<input type="text" name="endDate" size="6" placeholder="eDate">
+			<input type="submit" value="Add TPworks" name="addTPworks">
+		</form>
+		<?php
+			function generateTPworksDisplay() {
+				$toDisplay = "";
+				$result = executePlainSQL("select * from TPworks");
+			
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<tr><td>Employee ID</td><td>Start Date</td><td>End Date</td></tr>";
+			
+			
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<td>".$row["EMPLOYEEID"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["STARTDATE"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["ENDDATE"]."</td>";
+					$toDisplay = $toDisplay."</tr>";
+				}
+				$toDisplay = $toDisplay."</table>";
+			
+				return $toDisplay;
+			}
+		?>
+		<div id="TPworksDisplay"></div> <!-- TPworks display area-->
+	</div>
+	
+			<!--Employee-->
+	<div id="tab-Employee">
+			<form method="POST"> <!-- Employee form-->
+	
+			<input type="text" name="employeeID" size="6" placeholder="empID">
+			<input type="text" name="empName" size="6" placeholder="eName">
+			<input type="text" name="empSalary" size="6" placeholder="eSalary">
+			<input type="submit" value="Add Employee" name="addEmployee">
+		</form>
+		<?php
+			function generateEmployeeDisplay() {
+				$toDisplay = "";
+				$result = executePlainSQL("select * from Employee");
+			
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<tr><td>Employee ID</td><td>Employee Name</td><td>Employee Salary</td></tr>";
+			
+			
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<td>".$row["EMPLOYEEID"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["EMPNAME"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["EMPSALARY"]."</td>";
+					$toDisplay = $toDisplay."</tr>";
+				}
+				$toDisplay = $toDisplay."</table>";
+			
+				return $toDisplay;
+			}
+		?>
+		<div id="EmployeeDisplay"></div> <!-- Employee display area-->
 	</div>
 	
 	<!-- (Other tables...) -->
@@ -261,12 +329,19 @@
 				executePlainSQL("Drop table restaurant cascade constraints");
 				executePlainSQL("Drop table likes cascade constraints");
 				executePlainSQL("Drop table registered cascade constraints");
-				executePlainSQL("Drop table dish");
+				executePlainSQL("Drop table dish cascade constraints");
+				executePlainSQL("Drop table TPworks cascade constraints");
+				executePlainSQL("Drop table employee cascade constraints");
+				executePlainSQL("Drop table employs cascade constraints");
+				
 				
 				// Create new table...
 				executePlainSQL("create table member (memberID number, memberName varchar2(30), memberPhone number, memberAddress char(50), memberDiscount number, primary key (memberID))");
 				executePlainSQL("create table restaurant (restaurantPhone number, restaurantName varchar2(30), restaurantLocation char(50), primary key (restaurantPhone))");
 				executePlainSQL("create table dish (dishID number, dishName varchar2(50), dishStyle varchar2(20), dishPrice number, primary key(dishID))");
+				executePlainSQL("create table employee (employeeID number, empName varchar2(30), empSalary number,  primary key(employeeID))");
+				executePlainSQL("create table TPworks (employeeID number, startDate varchar2(10), endDate varchar2(10),  primary key(employeeID),foreign key (employeeID) references employee)");				
+				executePlainSQL("create table employs (restaurantPhone number, employeeID number, startDate varchar2(10), primary key(restaurantPhone,employeeID),foreign key (restaurantPhone) references restaurant, foreign key(employeeID) references TPworks)");
  				executePlainSQL("create table likes (memberID number, dishID number, primary key (memberID, dishID), foreign key(memberID) references member, foreign key (dishID) references dish)");
 				executePlainSQL("create table registered (memberID number, restaurantPhone number, primary key (memberID), foreign key (memberID) references member, foreign key (restaurantPhone) references restaurant)");
 				
@@ -309,6 +384,28 @@
 				);
 				executeBoundSQL("insert into restaurant values (:bind1, :bind2, :bind3)", $alltuples);
 				OCICommit($db_conn);
+			} elseif (array_key_exists('addTPworks', $_POST)){
+				$tuple = array ( //generate a new tuple
+					":bind1" => $_POST['employeeID'],
+					":bind2" => $_POST['startDate'],
+					":bind3" => $_POST['endDate']
+				);
+				$alltuples = array ( //wrap the tuple into an array
+					$tuple
+				);
+				executeBoundSQL("insert into TPworks values (:bind1, :bind2, :bind3)", $alltuples);
+				OCICommit($db_conn);
+			} elseif (array_key_exists('addEmployee', $_POST)){
+				$tuple = array ( //generate a new tuple
+					":bind1" => $_POST['employeeID'],
+					":bind2" => $_POST['empName'],
+					":bind3" => $_POST['empSalary']
+				);
+				$alltuples = array ( //wrap the tuple into an array
+					$tuple
+				);
+				executeBoundSQL("insert into Employee values (:bind1, :bind2, :bind3)", $alltuples);
+				OCICommit($db_conn);
 			} else { //If the page is just loaded
 				//Nothing for now
 			}
@@ -320,6 +417,8 @@
 		$("#memberDisplay").html("<?php echo generateMemberDisplay(); ?>");
 		$("#restaurantDisplay").html("<?php echo generateRestaurantDisplay(); ?>");
 		$("#dishDisplay").html("<?php echo generateDishDisplay(); ?>");
+		$("#TPworksDisplay").html("<?php echo generateTPworksDisplay(); ?>");
+		$("#EmployeeDisplay").html("<?php echo generateEmployeeDisplay(); ?>");
 		
 	</script>
 </body>
