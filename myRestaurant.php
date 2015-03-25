@@ -116,11 +116,6 @@
 		<div id="dishDisplay"></div> <!-- Dish display area-->
 	</div>
 	
-	<!--Sale-->
-	<div id="tab-Sale">
-		Content for sale
-	</div>
-	
 	
 	<!--Restaurant-->
 	<div id="tab-Restaurant">
@@ -156,6 +151,40 @@
 	</div>
 	
 	<!-- (Other tables...) -->
+
+	<!--Sale-->
+	<div id="tab-Sale">
+		<form method="POST"> <!-- Restaurant form-->
+		
+			<input type="text" name="saleID" size="6" placeholder="sale ID">
+			<input type="text" name="paymentMethod" size="6" placeholder="payment method">
+			<input type="text" name="discount" size="6" placeholder="discount rate">
+			<input type="submit" value="Add Sale" name="addSale">
+		</form>
+		<?php
+			function generateRestaurantDisplay() {
+				$toDisplay = "";
+				$result = executePlainSQL("select * from sale");
+			
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<tr><td>Phone</td><td>Name</td><td>Address</td></tr>";
+			
+			
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<td>".$row["SALEID"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["PAYMENTMETHOD"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["DISCOUNT"]."</td>";
+					$toDisplay = $toDisplay."</tr>";
+				}
+				$toDisplay = $toDisplay."</table>";
+			
+				return $toDisplay;
+			}
+		?>
+		<div id="saleDisplay"></div> <!-- sale display area-->
+	</div>
+	
 
 	
 	</div>
