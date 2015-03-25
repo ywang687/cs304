@@ -230,12 +230,12 @@
 			<input type="submit" value="Add Sale" name="addSale">
 		</form>
 		<?php
-			function generateRestaurantDisplay() {
+			function generateSaleDisplay() {
 				$toDisplay = "";
 				$result = executePlainSQL("select * from sale");
 			
 				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<tr><td>Phone</td><td>Name</td><td>Address</td></tr>";
+				$toDisplay = $toDisplay."<tr><td>sale ID</td><td>payment method</td><td>discount rate</td></tr>";
 			
 			
 				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
@@ -418,7 +418,7 @@
 				$alltuples = array ( //wrap the tuple into an array
 					$tuple
 				);
-				executeBoundSQL("insert into Employee values (:bind1, :bind2, :bind3)", $alltuples);
+				executeBoundSQL("insert into Sale values (:bind1, :bind2, :bind3)", $alltuples);
 				OCICommit($db_conn);
 			} else { //If the page is just loaded
 				//Nothing for now
@@ -433,6 +433,7 @@
 		$("#dishDisplay").html("<?php echo generateDishDisplay(); ?>");
 		$("#TPworksDisplay").html("<?php echo generateTPworksDisplay(); ?>");
 		$("#EmployeeDisplay").html("<?php echo generateEmployeeDisplay(); ?>");
+		$("#SaleDisplay").html("<?php echo generateSaleDisplay(); ?>");
 		
 	</script>
 </body>
