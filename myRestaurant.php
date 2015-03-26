@@ -44,6 +44,7 @@
 			<li><a href="#tab-Restaurant">Restaurant</a></li>
 			<li><a href="#tab-TPworks">TPworks</a></li>
 			<li><a href="#tab-Employee">Employee</a></li>
+			<li><a href="#tab-Supply">Supply</a></li>
 		</ul>
 	
 	<!--Member-->
@@ -217,6 +218,35 @@
 		?>
 		<div id="EmployeeDisplay"></div> <!-- Employee display area-->
 	</div>
+	<div id="tab-Supply">
+			<form method="POST"> <!-- Supply form-->
+	
+			<input type="text" name="supplyID" size="6" placeholder="Supply ID">
+			<input type="text" name="supplyName" size="6" placeholder="Supply Name">
+			<input type="submit" value="Add Supply" name="addSupply">
+		</form>
+		<?php
+			function generateSupplyDisplay() {
+				$toDisplay = "";
+				$result = executePlainSQL("select * from supply");
+			
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<thead><tr><th>Supply ID</th><th>Supply Name</th></tr></thead><tbody>";
+			
+			
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<td>".$row["SUPPLYID"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["SUPPLYNAME"]."</td>";
+					$toDisplay = $toDisplay."</tr>";
+				}
+				$toDisplay = $toDisplay."</tbody></table>";
+			
+				return $toDisplay;
+			}
+		?>
+		<div id="SupplyDisplay"></div> <!-- Supply display area-->
+	</div>
 	
 	<!-- (Other tables...) -->
 
@@ -286,7 +316,7 @@
 		}
 
 		function executeBoundSQL($cmdstr, $list) {
-			/* Sometimes a same statement will be excuted for severl times, only
+			/* Sometimes a same statement will be executed for several times, only
 			the value of variables need to be changed.
 			In this case you don't need to create the statement several times; 
 			using bind variables can make the statement be shared and just 
@@ -334,6 +364,7 @@
 				executePlainSQL("Drop table employee cascade constraints");
 				executePlainSQL("Drop table employs cascade constraints");
 				executePlainSQL("Drop table sale cascade constraints");
+				executePlainSQL("Drop table supply cascade constraints");
 				
 				
 				// Create new table...
@@ -345,7 +376,8 @@
 				executePlainSQL("create table employs (restaurantPhone number, employeeID number, startDate varchar2(10), primary key(restaurantPhone,employeeID),foreign key (restaurantPhone) references restaurant, foreign key(employeeID) references TPworks)");
  				executePlainSQL("create table likes (memberID number, dishID number, primary key (memberID, dishID), foreign key(memberID) references member, foreign key (dishID) references dish)");
 				executePlainSQL("create table registered (memberID number, restaurantPhone number, primary key (memberID), foreign key (memberID) references member, foreign key (restaurantPhone) references restaurant)");
-				executePlainSQL("create table sale (saleID number, paymentMethod varchar2(10), discount number");
+				executePlainSQL("create table sale (saleID number, paymentMethod varchar2(10), discount number)");
+				executePlainSQL("create table supply (supplyID number, supplyName varchar2(10), primary key (supplyID))");
 			
 
 				// save database
@@ -420,7 +452,17 @@
 				);
 				executeBoundSQL("insert into Sale values (:bind1, :bind2, :bind3)", $alltuples);
 				OCICommit($db_conn);
-			} else { //If the page is just loaded
+			} elseif (array_key_exists('addSupply', $_POST)) { //If addSupply button clicked
+				$tuple = array ( //generate a new tuple
+					":bind1" => $_POST['supplyID'],
+					":bind2" => $_POST['supplyName']
+				);
+				$alltuples = array ( //wrap the tuple into an array
+					$tuple
+				);
+				executeBoundSQL("insert into supply values (:bind1, :bind2)", $alltuples);
+				OCICommit($db_conn);
+      			} else { //If the page is just loaded
 				//Nothing for now
 			}
 		}
@@ -434,6 +476,7 @@
 		$("#TPworksDisplay").html("<?php echo generateTPworksDisplay(); ?>");
 		$("#EmployeeDisplay").html("<?php echo generateEmployeeDisplay(); ?>");
 		$("#SaleDisplay").html("<?php echo generateSaleDisplay(); ?>");
+		$("#SupplyDisplay").html("<?php echo generateSupplyDisplay(); ?>");
 		
 	</script>
 </body>
