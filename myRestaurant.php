@@ -54,13 +54,19 @@
 	<!--Member-->
 	<div id="tab-Member">
 		<form method="POST"> <!-- Member form-->
-		
+			<b>Add Member</b><br />
 			<input type="text" name="memberID" size="6" placeholder="ID">
 			<input type="text" name="memberName" size="6" placeholder="Name">
 			<input type="text" name="memberPhone" size="6" placeholder="Phone #">
 			<input type="text" name="memberAddress" size="6" placeholder="Address">
 			<input type="text" name="memberDiscount" size="6" placeholder="Discount rate">
 			<input type="submit" value="Add Member" name="addMember">
+			<br />
+			<b>Remove Member</b><br />
+			<input type="text" name="memberID_remove" size="6" placeholder="ID">
+			<input type="submit" value="Remove Member" name="rm_Member_id">
+			<br />
+			<h2>Member Data</h2>
 		</form>
 		<?php
 			function generateMemberDisplay() {
@@ -474,8 +480,8 @@
 				executePlainSQL("create table employee (employeeID number, empName varchar2(30), empSalary number,  primary key(employeeID))");
 				executePlainSQL("create table TPworks (employeeID number, startDate varchar2(10), endDate varchar2(10),  primary key(employeeID),foreign key (employeeID) references employee)");				
 				executePlainSQL("create table employs (restaurantPhone number, employeeID number, startDate varchar2(10), primary key(restaurantPhone,employeeID),foreign key (restaurantPhone) references restaurant, foreign key(employeeID) references TPworks)");
- 				executePlainSQL("create table likes (memberID number, dishID number, primary key (memberID, dishID), foreign key(memberID) references member, foreign key (dishID) references dish)");
-				executePlainSQL("create table registered (memberID number, restaurantPhone number, primary key (memberID), foreign key (memberID) references member, foreign key (restaurantPhone) references restaurant)");
+ 				executePlainSQL("create table likes (memberID number, dishID number, primary key (memberID, dishID), foreign key(memberID) references member on delete cascade, foreign key (dishID) references dish)");
+				executePlainSQL("create table registered (memberID number, restaurantPhone number, primary key (memberID, restaurantPhone), foreign key (memberID) references member on delete cascade, foreign key (restaurantPhone) references restaurant)");
 				executePlainSQL("create table sale (saleID number, paymentMethod varchar2(10), discount number)");
 				executePlainSQL("create table supply (supplyID number, supplyName varchar2(10), primary key (supplyID))");
 				executePlainSQL("create table supplier (supplierID number, supplierName varchar2(50), primary key (supplierID))");
@@ -497,6 +503,10 @@
 				);
 				executeBoundSQL("insert into member values (:bind1, :bind2, :bind3, :bind4, :bind5)", $alltuples);
 				OCICommit($db_conn);
+			} elseif (array_key_exists('rm_Member_id', $_POST)) { //If addMember button clicked
+				executePlainSQL("DELETE FROM member where memberID=".$_POST['memberID_remove']);
+				OCICommit($db_conn);
+				
 			} elseif (array_key_exists('addLikes', $_POST)) { //If addMember button clicked
 				$tuple = array ( //generate a new tuple
 					":bind1" => $_POST['memberID'],
