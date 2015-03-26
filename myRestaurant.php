@@ -175,21 +175,26 @@
 	
 	<!--likes-->
 	<div id="tab-Likes">
-		<form method="POST"> <!-- Member form-->
-		
+		<b>Likes</b>
+		<form method="POST"> <!-- Likes form-->
 			<input type="text" name="memberID" size="6" placeholder="Member ID">
 			<input type="text" name="dishID" size="6" placeholder="Dish ID">
 			<input type="submit" value="Add Likes" name="addLikes">
 		</form>
+		<div id="likesDisplay"></div> <!-- Likes display area-->
+		<br />
+		<b>Likes (Joined with Member and Dish)</b>
+		<div id="likesJoinedDisplay"></div> <!-- Likes display area-->
+		<br />
+		
 		<?php
 			function generateLikesDisplay() {
 				$toDisplay = "";
 				$result = executePlainSQL("select * from likes");
-			
+				
 				$toDisplay = $toDisplay."<table border='1' width='100%'>";
 				$toDisplay = $toDisplay."<tr><td>Member ID</td><td>Dish ID</td></tr>";
-			
-			
+				
 				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 					$toDisplay = $toDisplay."<tr>";
 					$toDisplay = $toDisplay."<td>".$row["MEMBERID"]."</td>";
@@ -201,7 +206,29 @@
 				return $toDisplay;
 			}
 		?>
-		<div id="likesDisplay"></div> <!-- Member display area-->
+		
+		<?php
+			function generateJoinedLikesDisplay(){
+				$toDisplay = "";
+				$result = executePlainSQL("SELECT * FROM(SELECT * FROM MEMBER NATURAL JOIN LIKES) NATURAL JOIN DISH");
+				
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<tr><td>Member ID</td><td>Member Name</td><td>Dish ID</td><td>Dish Name</td></tr>";
+				
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<td>".$row["MEMBERID"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["MEMBERNAME"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["DISHID"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["DISHNAME"]."</td>";
+					$toDisplay = $toDisplay."</tr>";
+				}
+				$toDisplay = $toDisplay."</table>";
+			
+				return $toDisplay;
+			}
+		?>
+		
 	</div>
 	
 	<!--registered-->
@@ -703,7 +730,7 @@
 		$("#likesDisplay").html("<?php echo generateLikesDisplay(); ?>");
 		$("#registeredDisplay").html("<?php echo generateRegisteredDisplay(); ?>");
 		$("#memberSearchDisplay").html("<?php echo $memberSearchResult; ?>");
-		
+		$("#likesJoinedDisplay").html("<?php echo generateJoinedLikesDisplay(); ?>");
 		
 	</script>
 </body>
