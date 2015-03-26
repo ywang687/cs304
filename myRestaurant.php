@@ -14,8 +14,8 @@
 		</script>
 		<?php 
 			// Database log-in information
-			$databaseUserName="ora_u5n8";
-			$databasePassword="a40227118";
+			$databaseUserName="ora_u0j8";
+			$databasePassword="a45777109";
 			
 			$success = True; //keep track of errors so it redirects the page only if there are no errors
 			$db_conn = OCILogon($databaseUserName, $databasePassword, "ug");
@@ -39,6 +39,8 @@
 	<div id="tabs">
 		<ul>
 			<li><a href="#tab-Member">Member</a></li>
+			<li><a href="#tab-Likes">Likes</a></li>
+			<li><a href="#tab-Registered">Registered</a></li>
 			<li><a href="#tab-Dish">Dish</a></li>
 			<li><a href="#tab-Sale">Sale</a></li>
 			<li><a href="#tab-Restaurant">Restaurant</a></li>
@@ -46,6 +48,7 @@
 			<li><a href="#tab-Employee">Employee</a></li>
 			<li><a href="#tab-Supply">Supply</a></li>
 			<li><a href="#tab-Supplier">Supplier</a></li>
+			
 		</ul>
 	
 	<!--Member-->
@@ -83,6 +86,68 @@
 			}
 		?>
 		<div id="memberDisplay"></div> <!-- Member display area-->
+	</div>
+	
+	<!--likes-->
+	<div id="tab-Likes">
+		<form method="POST"> <!-- Member form-->
+		
+			<input type="text" name="memberID" size="6" placeholder="Member ID">
+			<input type="text" name="dishID" size="6" placeholder="Dish ID">
+			<input type="submit" value="Add Likes" name="addLikes">
+		</form>
+		<?php
+			function generateLikesDisplay() {
+				$toDisplay = "";
+				$result = executePlainSQL("select * from likes");
+			
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<tr><td>Member ID</td><td>Dish ID</td></tr>";
+			
+			
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<td>".$row["MEMBERID"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["DISHID"]."</td>";
+					$toDisplay = $toDisplay."</tr>";
+				}
+				$toDisplay = $toDisplay."</table>";
+			
+				return $toDisplay;
+			}
+		?>
+		<div id="likesDisplay"></div> <!-- Member display area-->
+	</div>
+	
+	<!--registered-->
+	<div id="tab-Registered">
+		<form method="POST"> <!-- Member form-->
+		
+			<input type="text" name="memberID" size="10" placeholder="Member ID">
+			<input type="text" name="restaurantPhone" size="10" placeholder="Restaurant Phone">
+			<input type="submit" value="Add Registered" name="addRegistered">
+		</form>
+		<?php
+			function generateRegisteredDisplay() {
+				$toDisplay = "";
+				$result = executePlainSQL("select * from registered");
+			
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<tr><td>Member ID</td><td>Restaurant Phone</td></tr>";
+			
+			
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<td>".$row["MEMBERID"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["RESTAURANTPHONE"]."</td>";
+					$toDisplay = $toDisplay."</tr>";
+				}
+				$toDisplay = $toDisplay."</table>";
+			
+				return $toDisplay;
+			}
+		?>
+		<div id="registeredDisplay"></div> <!-- Member display area-->
 	</div>
 	
 	<!--Dish-->
@@ -432,6 +497,26 @@
 				);
 				executeBoundSQL("insert into member values (:bind1, :bind2, :bind3, :bind4, :bind5)", $alltuples);
 				OCICommit($db_conn);
+			} elseif (array_key_exists('addLikes', $_POST)) { //If addMember button clicked
+				$tuple = array ( //generate a new tuple
+					":bind1" => $_POST['memberID'],
+					":bind2" => $_POST['dishID']
+				);
+				$alltuples = array ( //wrap the tuple into an array
+					$tuple
+				);
+				executeBoundSQL("insert into likes values (:bind1, :bind2)", $alltuples);
+				OCICommit($db_conn);
+			} elseif (array_key_exists('addRegistered', $_POST)) { //If addMember button clicked
+				$tuple = array ( //generate a new tuple
+					":bind1" => $_POST['memberID'],
+					":bind2" => $_POST['restaurantPhone']
+				);
+				$alltuples = array ( //wrap the tuple into an array
+					$tuple
+				);
+				executeBoundSQL("insert into registered values (:bind1, :bind2)", $alltuples);
+				OCICommit($db_conn);
 			} elseif (array_key_exists('addDish', $_POST)){
 				$tuple = array ( //generate a new tuple
 					":bind1" => $_POST['dishID'],
@@ -524,6 +609,9 @@
 		$("#SaleDisplay").html("<?php echo generateSaleDisplay(); ?>");
 		$("#SupplyDisplay").html("<?php echo generateSupplyDisplay(); ?>");
 		$("#SupplierDisplay").html("<?php echo generateSupplierDisplay(); ?>");
+		$("#likesDisplay").html("<?php echo generateLikesDisplay(); ?>");
+		$("#registeredDisplay").html("<?php echo generateRegisteredDisplay(); ?>");
+		
 		
 	</script>
 </body>
