@@ -61,12 +61,34 @@
 			<input type="text" name="memberAddress" size="6" placeholder="Address">
 			<input type="text" name="memberDiscount" size="6" placeholder="Discount rate">
 			<input type="submit" value="Add Member" name="addMember">
-			<br />
+			<br /><br />
 			<b>Remove Member</b><br />
 			<input type="text" name="memberID_remove" size="6" placeholder="ID">
 			<input type="submit" value="Remove Member" name="rm_Member_id">
+			<br /><br />
+			<b>Member Data</b>
+			<div id="memberDisplay"></div> <!-- Member display area-->
 			<br />
-			<h2>Member Data</h2>
+			<b>Member Search By Discount Rate</b><br />
+			<input type="text" name="memberDiscount_search" size="15" placeholder="Discount Rate">
+			<input type="radio" name="memberSearchOption"
+				<?php if (isset($memberSearchOption) && $memberSearchOption=="smaller") echo "checked";?>
+				value="smaller" checked>smaller
+			<input type="radio" name="memberSearchOption"
+				<?php if (isset($memberSearchOption) && $memberSearchOption=="equals") echo "checked";?>
+				value="equals">equals
+			<input type="radio" name="memberSearchOption"
+				<?php if (isset($memberSearchOption) && $memberSearchOption=="greater") echo "checked";?>
+				value="greater">greater
+			<br />
+			<input type="checkbox" name="MemberSearch_DiscountRate_showID">showID
+			<input type="checkbox" name="MemberSearch_DiscountRate_showName">showName
+			<input type="checkbox" name="MemberSearch_DiscountRate_showPhone">showPhone
+			<input type="checkbox" name="MemberSearch_DiscountRate_showAddress">showAddress
+			<input type="checkbox" name="MemberSearch_DiscountRate_showDiscountRate">showDiscountRate
+			<br />
+			<input type="submit" value="Search Member" name="search_Member_discount">
+			<div id="memberSearchDisplay"></div> <!-- Member Search display area-->
 		</form>
 		<?php
 			function generateMemberDisplay() {
@@ -91,7 +113,64 @@
 				return $toDisplay;
 			}
 		?>
-		<div id="memberDisplay"></div> <!-- Member display area-->
+		<?php
+			$memberSearchResult = "(No search requested)";
+			function generateMemberSearchDisplay($discountRateToSearch) {
+				// discountRateToSearch should be [0 100]
+				// searchOption: smaller, greater, equals. $searchOption
+				$toDisplay = "Search for member with discount rate of ".$discountRateToSearch.", ".$_POST['memberSearchOption'];
+				
+				//(isset($_POST['MemberSearch_DiscountRate_showID']))
+				$categoryToShow=array();
+				if(isset($_POST['MemberSearch_DiscountRate_showID'])){array_push($categoryToShow,"memberID");}
+				if(isset($_POST['MemberSearch_DiscountRate_showName'])){array_push($categoryToShow,"memberName");}
+				if(isset($_POST['MemberSearch_DiscountRate_showPhone'])){array_push($categoryToShow,"memberPhone");}
+				if(isset($_POST['MemberSearch_DiscountRate_showAddress'])){array_push($categoryToShow,"memberAddress");}
+				if(isset($_POST['MemberSearch_DiscountRate_showDiscountRate'])){array_push($categoryToShow,"memberDiscount");}
+				
+				$temp = "";
+				for ($i = 0; $i < count($categoryToShow); $i++) {
+					if($i > 0){$temp=$temp.", ";}
+					$temp=$temp.$categoryToShow[$i]." ";
+				}
+				if($temp==""){
+					$toDisplay=$toDisplay.". Showing no category";
+					$temp=" * ";
+				} else {
+					$toDisplay=$toDisplay.". Showing ".$temp;
+				}
+				if($temp!=""){
+					if($_POST['memberSearchOption'] == 'smaller'){
+						$theStatement="select ".$temp." from member where memberDiscount<".$discountRateToSearch;
+						$result = executePlainSQL("select ".$temp." from member where memberDiscount<".$discountRateToSearch);
+					}elseif($_POST['memberSearchOption'] == 'greater'){
+						$result = executePlainSQL("select ".$temp." from member where memberDiscount>".$discountRateToSearch);
+					} else {
+						$result = executePlainSQL("select ".$temp." from member where memberDiscount=".$discountRateToSearch);
+					}
+					
+					$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				
+					$toDisplay = $toDisplay."<tr>";
+					for ($i = 0; $i < count($categoryToShow); $i++) {
+						$toDisplay = $toDisplay."<td><b>".$categoryToShow[$i]."</b></td>";
+					}
+					$toDisplay = $toDisplay."</tr>";
+			
+			
+					while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+						$toDisplay = $toDisplay."<tr>";
+						for ($i = 0; $i < count($categoryToShow); $i++) {
+							$toDisplay = $toDisplay."<td>".$row[$i]."</td>";
+						}
+						$toDisplay = $toDisplay."</tr>";
+					}
+					$toDisplay = $toDisplay."</table>";
+				}
+				return $toDisplay;
+			}
+		?>
+		
 	</div>
 	
 	<!--likes-->
@@ -506,6 +585,8 @@
 			} elseif (array_key_exists('rm_Member_id', $_POST)) { //If addMember button clicked
 				executePlainSQL("DELETE FROM member where memberID=".$_POST['memberID_remove']);
 				OCICommit($db_conn);
+			} elseif (array_key_exists('search_Member_discount', $_POST)) { //If addMember button clicked
+				$memberSearchResult = generateMemberSearchDisplay($_POST['memberDiscount_search']);
 				
 			} elseif (array_key_exists('addLikes', $_POST)) { //If addMember button clicked
 				$tuple = array ( //generate a new tuple
@@ -621,6 +702,7 @@
 		$("#SupplierDisplay").html("<?php echo generateSupplierDisplay(); ?>");
 		$("#likesDisplay").html("<?php echo generateLikesDisplay(); ?>");
 		$("#registeredDisplay").html("<?php echo generateRegisteredDisplay(); ?>");
+		$("#memberSearchDisplay").html("<?php echo $memberSearchResult; ?>");
 		
 		
 	</script>
