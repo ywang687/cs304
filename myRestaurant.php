@@ -370,6 +370,7 @@
 	
 			<input type="text" name="employeeID" size="6" placeholder="empID">
 			<input type="text" name="empName" size="6" placeholder="eName">
+			<input type="text" name="empPosition" size="6" placeholder="ePosition">
 			<input type="text" name="empSalary" size="6" placeholder="eSalary">
 			<input type="submit" value="Add Employee" name="addEmployee">
 		</form>
@@ -379,13 +380,14 @@
 				$result = executePlainSQL("select * from Employee");
 			
 				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<tr><td>Employee ID</td><td>Employee Name</td><td>Employee Salary</td></tr>";
+				$toDisplay = $toDisplay."<tr><td>Employee ID</td><td>Employee Name</td><td>Employee Position</td><td>Employee Salary</td></tr>";
 			
 			
 				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 					$toDisplay = $toDisplay."<tr>";
 					$toDisplay = $toDisplay."<td>".$row["EMPLOYEEID"]."</td>";
 					$toDisplay = $toDisplay."<td>".$row["EMPNAME"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["EMPPOSITION"]."</td>";
 					$toDisplay = $toDisplay."<td>".$row["EMPSALARY"]."</td>";
 					$toDisplay = $toDisplay."</tr>";
 				}
@@ -580,15 +582,15 @@
 				
 				
 				// Create new table...
-				executePlainSQL("create table member (memberID number, memberName varchar2(30), memberPhone number, memberAddress char(50), memberDiscount number, primary key (memberID))");
-				executePlainSQL("create table restaurant (restaurantPhone number, restaurantName varchar2(30), restaurantLocation char(50), primary key (restaurantPhone))");
+				executePlainSQL("create table member (memberID number, memberName varchar2(30), memberPhone number, memberAddress char(60), memberDiscount number, primary key (memberID))");
+				executePlainSQL("create table restaurant (restaurantPhone number, restaurantName varchar2(30), restaurantLocation char(60), primary key (restaurantPhone))");
 				executePlainSQL("create table dish (dishID number, dishName varchar2(50), dishStyle varchar2(20), dishPrice number, primary key(dishID))");
-				executePlainSQL("create table employee (employeeID number, empName varchar2(30), empSalary number,  primary key(employeeID))");
+				executePlainSQL("create table employee (employeeID number, empName varchar2(30), empPosition varchar2(20), empSalary number,  primary key(employeeID))");
 				executePlainSQL("create table TPworks (employeeID number, startDate varchar2(10), endDate varchar2(10),  primary key(employeeID),foreign key (employeeID) references employee)");				
 				executePlainSQL("create table employs (restaurantPhone number, employeeID number, startDate varchar2(10), primary key(restaurantPhone,employeeID),foreign key (restaurantPhone) references restaurant, foreign key(employeeID) references TPworks)");
  				executePlainSQL("create table likes (memberID number, dishID number, primary key (memberID, dishID), foreign key(memberID) references member on delete cascade, foreign key (dishID) references dish)");
 				executePlainSQL("create table registered (memberID number, restaurantPhone number, primary key (memberID, restaurantPhone), foreign key (memberID) references member on delete cascade, foreign key (restaurantPhone) references restaurant)");
-				executePlainSQL("create table sale (saleID number, paymentMethod varchar2(10), discount number)");
+				executePlainSQL("create table sale (saleID number, paymentMethod varchar2(10), discount number, primary key(saleID), foreign key (discount number) references member (memberDiscount) )");
 				executePlainSQL("create table supply (supplyID number, supplyName varchar2(10), primary key (supplyID))");
 				executePlainSQL("create table supplier (supplierID number, supplierName varchar2(50), primary key (supplierID))");
 			
@@ -673,12 +675,13 @@
 				$tuple = array ( //generate a new tuple
 					":bind1" => $_POST['employeeID'],
 					":bind2" => $_POST['empName'],
-					":bind3" => $_POST['empSalary']
+					":bind3" => $_POST['empPosition'],
+					":bind4" => $_POST['empSalary']
 				);
 				$alltuples = array ( //wrap the tuple into an array
 					$tuple
 				);
-				executeBoundSQL("insert into Employee values (:bind1, :bind2, :bind3)", $alltuples);
+				executeBoundSQL("insert into Employee values (:bind1, :bind2, :bind3, :bind4)", $alltuples);
 				OCICommit($db_conn);
 			} elseif (array_key_exists('addSale', $_POST)){
 				$tuple = array ( //generate a new tuple
