@@ -609,6 +609,12 @@
 			<input type="text" name="units" size="10" placeholder="Units">
 			<input type="submit" value="Add Stocks" name="addStocks">
 		</form>
+		<strong>Update Stock</strong><br />
+		<form method="POST"> <!-- Stock update form -->
+			<input type="text" name="supplyID_update" size="6" placeholder="Stock ID">
+			<input type="text" name="update_quantity" size="6" placeholder="New Quantity">
+			<input type="submit" value="Update Stock" name="update_stock">
+		</form>
 		<?php
 			function generateStocksDisplay() {
 				$toDisplay = "";
@@ -631,7 +637,31 @@
 				return $toDisplay;
 			}
 		?>
+
+		<?php
+			function generateMinimumStockDisplay(){
+				$toDisplay = "";
+				$result = executePlainSQL("SELECT SU.supplyID, SU.supplyName, ST.quantity, ST.units FROM supply SU, stocks ST WHERE SU.supplyID=ST.supplyID AND ST.quantity =(SELECT MIN(quantity) FROM stocks)");
+				
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<thead><tr><th>Supply ID</th><th>Supply Name</th><th>Supply Quantity</th><th>Units</th></tr></thead><tbody>";
+				
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<td>".$row["SUPPLYID"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["SUPPLYNAME"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["QUANTITY"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["UNITS"]."</td>";
+					$toDisplay = $toDisplay."</tr>";
+				}
+				$toDisplay = $toDisplay."</table>";
+			
+				return $toDisplay;
+			}
+		?>
 		<div id="StocksDisplay"></div> <!-- Stocks display area-->
+		<strong>Stock with low quantity</strong>
+		<div id="MinimumStockDisplay"></div> <!-- minimum Stock display area -->
 	</div>
 	<!-- end Stocks -->
 
@@ -972,7 +1002,18 @@
 				);
 				executeBoundSQL("insert into stocks values (:bind1, :bind2, :bind3, :bind4)", $alltuples);
 				OCICommit($db_conn);
-      			} elseif (array_key_exists('addSupplies', $_POST)) { //If addSupplies button clicked
+      			} elseif (array_key_exists('update_stock', $_POST)) { //If addMember button clicked
+				$tuple = array ( //generate a new tuple
+					":bind2" => $_POST['supplyID_update'],
+					":bind1" => $_POST['update_quantity']
+
+				);
+				$alltuples = array ( //wrap the tuple into an array
+					$tuple
+				);
+				executePlainSQL("UPDATE stocks ST SET ST.quantity=:bind1 where ST.supplyID=:bind2", $alltuples);
+				OCICommit($db_conn);
+			} elseif (array_key_exists('addSupplies', $_POST)) { //If addSupplies button clicked
 				$tuple = array ( //generate a new tuple
 					":bind1" => $_POST['purchaseID'],
 					":bind2" => $_POST['supplierID'],
@@ -1019,7 +1060,7 @@
 		$("#StocksDisplay").html("<?php echo generateStocksDisplay(); ?>");
 		$("#SuppliesDisplay").html("<?php echo generateSuppliesDisplay(); ?>");
 		$("#PurchaseDisplay").html("<?php echo generatePurchaseDisplay(); ?>");
-		
+		$("#MinimumStockDisplay").html("<?php echo generateMinimumStockDisplay(); ?>");
 	</script>
 </body>
 </html>
