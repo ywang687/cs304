@@ -14,8 +14,8 @@
 		</script>
 		<?php 
 			// Database log-in information
-			$databaseUserName="ora_z6j7";
-			$databasePassword="a72495096";
+			$databaseUserName="ora_u0j8";
+			$databasePassword="a45777109";
 			
 			$success = True; //keep track of errors so it redirects the page only if there are no errors
 			$db_conn = OCILogon($databaseUserName, $databasePassword, "ug");
@@ -271,7 +271,6 @@
 	<!--Dish-->
 	<div id="tab-Dish">
 		<form method="POST"> <!-- Dish form-->
-		
 			<input type="text" name="dishID" size="6" placeholder="dID">
 			<input type="text" name="dishName" size="6" placeholder="dName">
 			<input type="text" name="dishStyle" size="6" placeholder="dStyle">
@@ -302,18 +301,25 @@
 		?>
 
 		<?php
-			function generateMaximumAveragePriceDisplay(){
+			function generateDishAverageSortDisplay() {
 				$toDisplay = "";
-				$result = executePlainSQL("SELECT dishStyle, AVG(dishPrice) as dishPrice FROM dish GROUP BY dishStyle ORDER BY dishPrice DESC");
-				
+				$query = "SELECT dishStyle, AVG(dishPrice) as dishPrice FROM dish GROUP BY dishStyle ORDER BY dishPrice ";
+				if($_POST['dishAverageSortOption'] == 'ASC'){
+					$query=$query."ASC";
+				} else { //($_POST['memberSearchOption'] == 'DESC')
+					$query=$query."DESC";
+				}
+				$result = executePlainSQL($query);
+
 				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<thead><tr><th>Dish Style</th><th>Average Dish Price</th></tr></thead><tbody>";
-				
+				$toDisplay = $toDisplay."<thead><tr><th>Dish Style</th><th>Average Price</th></tr></thead>";
+			
+			
 				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<tbody><tr>";
 					$toDisplay = $toDisplay."<td>".$row["DISHSTYLE"]."</td>";
 					$toDisplay = $toDisplay."<td>".$row["DISHPRICE"]."</td>";
-					$toDisplay = $toDisplay."</tr>";
+					$toDisplay = $toDisplay."</tr></tbody>";
 				}
 				$toDisplay = $toDisplay."</table>";
 			
@@ -321,32 +327,23 @@
 			}
 		?>
 
-		<?php
-			function generateMinimumAveragePriceDisplay(){
-				$toDisplay = "";
-				$result = executePlainSQL("SELECT dishStyle, AVG(dishPrice) as dishPrice FROM dish GROUP BY dishStyle ORDER BY dishPrice ASC");
-				
-				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<thead><tr><th>Dish Style</th><th>Average Dish Price</th></tr></thead><tbody>";
-				
-				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-					$toDisplay = $toDisplay."<tr>";
-					$toDisplay = $toDisplay."<td>".$row["DISHSTYLE"]."</td>";
-					$toDisplay = $toDisplay."<td>".$row["DISHPRICE"]."</td>";
-					$toDisplay = $toDisplay."</tr>";
-				}
-				$toDisplay = $toDisplay."</table>";
-			
-				return $toDisplay;
-			}
-		?>
+		
 		<div id="dishDisplay"></div> <!-- Dish display area-->
 		<br />
-		<strong>Dish style by (descending) average price</strong>
-		<div id="dishMaximumAverageDisplay"></div> <!-- Dish display area-->
-		<br />
-		<strong>Dish style by (ascending) average price</strong>
-		<div id="dishMinimumAverageDisplay"></div> <!-- Dish display area-->
+		<strong>Member Search By Discount Rate</strong><br />
+		<form method="POST"> <!-- Dish sort form -->
+			<input type="radio" name="dishAverageSortOption"
+				<?php if (isset($dishAverageSortOption) && $dishAverageSortOption=="ASC") echo "checked";?>
+				value="ASC" checked>Ascending
+			<input type="radio" name="dishAverageSortOption"
+				<?php if (isset($dishAverageSortOption) && $dishAverageSortOption=="DESC") echo "checked";?>
+				value="DESC">Descending
+			<br />
+			<input type="submit" value="Sort" name="sort_dish_average">
+			
+		</form>
+		<strong>Dish style by average price</strong>
+		<div id="dishAverageSortDisplay"></div> <!-- dish Sort display area-->
 	</div>
 	
 	
@@ -965,6 +962,9 @@
 			} elseif (array_key_exists('search_Member_discount', $_POST)) { //If addMember button clicked
 				$memberSearchResult = generateMemberSearchDisplay($_POST['memberDiscount_search']);
 				
+			} elseif (array_key_exists('sort_dish_average', $_POST)) { //If addMember button clicked
+				$dishSortResult = generateDishAverageSortDisplay();
+				
 			} elseif (array_key_exists('addLikes', $_POST)) { //If addMember button clicked
 				$tuple = array ( //generate a new tuple
 					":bind1" => $_POST['memberID'],
@@ -1147,8 +1147,7 @@
 		$("#memberDisplay").html("<?php echo generateMemberDisplay(); ?>");
 		$("#restaurantDisplay").html("<?php echo generateRestaurantDisplay(); ?>");
 		$("#dishDisplay").html("<?php echo generateDishDisplay(); ?>");
-		$("#dishMinimumAverageDisplay").html("<?php echo generateMinimumAveragePriceDisplay(); ?>");
-		$("#dishMaximumAverageDisplay").html("<?php echo generateMaximumAveragePriceDisplay(); ?>");
+		$("#dishAverageSortDisplay").html("<?php echo $dishSortResult; ?>");
 		$("#TPworksDisplay").html("<?php echo generateTPworksDisplay(); ?>");
 		$("#EmployeeDisplay").html("<?php echo generateEmployeeDisplay(); ?>");
 		$("#saleDisplay").html("<?php echo generateSaleDisplay(); ?>");
