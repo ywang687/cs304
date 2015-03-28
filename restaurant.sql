@@ -1,10 +1,3 @@
--- 	Database Table Creation
---
---	This file will create the tables for the restaurant database
---  It is run automatically by the installation script.
---
---  First drop any existing tables. Any errors are ignored.
-				
 drop table member cascade constraints;
 drop table restaurant cascade constraints;
 drop table likes cascade constraints;
@@ -16,77 +9,17 @@ drop table employs cascade constraints;
 drop table sale cascade constraints;
 drop table supply cascade constraints;
 drop table supplier cascade constraints;
-
--- Now, add each table.
-
-create table member(
-	memberID number(6,0) primary key,
-	memberName varchar2(30),
-	memberPhone number(10,0),
-	memberAddress char(70),
-	memberDiscount number(3,2)
-	);
-create table restaurant(
-	restaurantPhone number(10,0) primary key,
-	restaurantName varchar2(30),
-	restaurantLocation char(70),
-	unique (restaurantName)
-	);
-create table dish( dishID number(4,0) primary key, 	
-	dishName varchar2(50), 	
-	dishStyle varchar2(20), 
-	dishPrice number(5,2));
-
-create table employee(
-	employeeID number(4,0) primary key,
-	empName varchar2(30),
-	empPosition varchar2(20),
-	empSalary number(7,2)
-	);
-create table TPworks(
-	employeeID number(5,0) primary key,
-	startDate varchar2(10),
-	endDate varchar2(10),
-	foreign key (employeeID) references employee on delete cascade
-	);
-create table employs(
-	restaurantPhone number(10,0),
-	employeeID number(5,0),
-	startDate varchar2(10),
-	primary key (restaurantPhone,employeeID),
-	foreign key (restaurantPhone) references restaurant on delete cascade, 
-	foreign key(employeeID) references TPworks on delete cascade
-	);
-create table likes(
-	memberID number(6,0),
-	dishID number(4,0),
-	primary key (memberID, dishID),
-	foreign key (memberID) references member on delete cascade, 
-	foreign key (dishID) references dish on delete cascade
-	);
-create table registered(
-	memberID number(6,0) primary key,
-	restaurantPhone number(10,0),
-	foreign key (memberID) references member on delete cascade,
-	foreign key (restaurantPhone) references restaurant on delete cascade
-	);
-create table sale(
-	saleID number(8,0) primary key,
-	paymentMethod varchar2(20),
-	discount number(3,2)
-	);
-create table supply(
-	supplyID number(6,0) primary key,
-	supplyName varchar2(20)
-	);
-create table supplier(
-	supplierID number(5,0) primary key,
-	supplierName varchar2(50)
-	);
-
-	
--- done adding all of the tables, now add in some tuples
---  first, add in the restaurant members 'meberID-mName-mphone#-mAddress-mdiscount'
+create table member(memberID number(6,0) primary key,memberName varchar2(30),memberPhone number(10,0),memberAddress char(70),memberDiscount number(3,2)	);
+create table restaurant(restaurantPhone number(10,0) primary key,restaurantName varchar2(30),restaurantLocation char(70),unique (restaurantName)	);
+create table dish( dishID number(4,0) primary key, 	dishName varchar2(50), 	dishStyle varchar2(20), dishPrice number(5,2));
+create table employee(employeeID number(4,0) primary key,empName varchar2(30),empPosition varchar2(20),empSalary number(7,2));
+create table TPworks(employeeID number(5,0) primary key,startDate varchar2(10),endDate varchar2(10),foreign key (employeeID) references employee on delete cascade);
+create table employs(restaurantPhone number(10,0),employeeID number(5,0),startDate varchar2(10),primary key (restaurantPhone,employeeID),foreign key (restaurantPhone) references restaurant on delete cascade, foreign key(employeeID) references TPworks on delete cascade);
+create table likes(memberID number(6,0),dishID number(4,0),primary key (memberID, dishID),foreign key (memberID) references member on delete cascade, foreign key (dishID) references dish on delete cascade);
+create table registered(memberID number(6,0) primary key,restaurantPhone number(10,0),foreign key (memberID) references member on delete cascade,foreign key (restaurantPhone) references restaurant on delete cascade);
+create table sale(saleID number(8,0) primary key,paymentMethod varchar2(20),discount number(3,2));
+create table supply(supplyID number(6,0) primary key,supplyName varchar2(20));
+create table supplier(supplierID number(5,0) primary key,supplierName varchar2(50));
 insert into member values(134567,'Arnold Brown',7786789000,'100 7240 Johnston Drive, Vancouver, BC, Canada, V3A8S8',0.06);
 insert into member values(134568,'Alexander Queen',6046722176,'334 3489 Eighth Street, New Westminster, BC, Canada, V8D6F8',0.05);
 insert into member values(134569,'Alexander Gordon',6046789886,'634 808 Fir Street, Vancouver, BC, Canada, V7C1H5',0.05);
@@ -112,17 +45,10 @@ insert into member values(134588,'Yuxin Hon',7785738726,'89 9876 Lacasse BLVD, L
 insert into member values(134589,'Daphne White',7786098735,'672 424 Walker Drive, Richmond, BC, Canada, V3V6T8',0.08);
 insert into member values(134590,'Khloe Lee',6049727634,'580 3424 Edilcan Street, Vancouver, BC, Canada, V6W3T4',0.10);
 insert into member values(134591,'Ewa Patrick',7783107574,'8764 East Creek Road, Langley, BC, Canada, V1A7S8',0.10);
-
-
---now add in the restaurant 'phone#-resName-resAddress'
 insert into restaurant values (7785688999,'City of Fish','8076 Tenth Street, Vancouver, BC, Canada, V5H8F7');
 insert into restaurant values (6049566944,'Fish Eye','36838 Linden Street, Richmond, BC, Canada, V7K7DK');
 insert into restaurant values (6042677899,'Fishland','4589 Fir Street, Burnaby, BC, Canada, V4G9S8');
 insert into restaurant values (6049700900,'Fish, Fat and the Otter','9478 Seventh Avenue, White Rock, BC, Canada, V3J7D9');
-
-
---now add in the dishes 'dishID-dishName-dishStyle-dishPrice'
---main dishes
 insert into dish values(1001,'Capers and Halibut','Canadian',16.99);
 insert into dish values(1002,'Spanish Moroccan Fish','Moroccan',18.99);
 insert into dish values(1003,'Quick Fish Tacos','Mexican',9.99);
@@ -138,7 +64,6 @@ insert into dish values(1016,'Fish Fillets Italiano','Italian',13.99);
 insert into dish values(1017,'Barbeque Halibut Steaks','Canadian',18.99);
 insert into dish values(1018,'Tasty Salmon Burger','Canadian',11.99);
 insert into dish values(1019,'Asian Tuna Patties','Chinese',17.99);
---appetizers
 insert into dish values(1010,'Caesar Salad Supreme','Canadian',7.99);
 insert into dish values(1011,'Clam Chowder','Canadian',6.99);
 insert into dish values(1012,'Eggplant Pancakes','Chinese',5.99);
@@ -149,21 +74,16 @@ insert into dish values(1021,'White Bean Panna Cotta and Smoked Trout Roe','Cana
 insert into dish values(1022,'Cream of Potato and Leek caramelized','French',6.99);
 insert into dish values(1023,'Mussels in White Wine','Canadian',6.99);
 insert into dish values(1024,'Thai Coconut Soup with Chicken and Coriander','Thai',5.99);
---desserts
 insert into dish values(1025,'Kirsch Souffle','German',5.99);
 insert into dish values(1026,'Apple Trifle with Mascarpone Cream','French',5.99);
 insert into dish values(1027,'Orange Dessert with Vanilla Cream','French',4.99);
 insert into dish values(1028,'Hot Chocolate Galettes','Polish',3.99);
 insert into dish values(1029,'Cappuccino Cake With Toasted Nuts','Canadian',4.99);
---drinks
 insert into dish values(1030,'Kirsch','German',6.99);
 insert into dish values(1031,'Irish Cream Coffee','American',4.99);
 insert into dish values(1032,'Rum Cider Punch','Mexican',6.99);
 insert into dish values(1033,'Swedish Glogg','Swedish',5.99);
 insert into dish values(1034,'Japanese Jasmine Tea','Japanese',3.99);
-
-		
---now add in the employees 'empID-empName-empPosition-empSalary'
 insert into employee values (2000,'Folker Schmidt','President/CEO',20000.00);
 insert into employee values (2001,'Adalrich Gourmet','General Manager',5000.00);
 insert into employee values (2002,'Christian Shaden','General Manager',5000.00);
@@ -201,8 +121,6 @@ insert into employee values (2014,'Peter Pan','Bus person',1600.00);
 insert into employee values (2015,'Ralph Loren','Bus person',1600.00);
 insert into employee values (2034,'Scott Kent','Bus person',1600.00);
 insert into employee values (2016,'Emil Moose','Bus person',1600.00);
-
---now add in TimePeriodWorks 'empID-startDate-endDate'
 insert into TPworks values (2000,'02.02.2012','null');
 insert into TPworks values (2001,'02.02.2012','null');
 insert into TPworks values (2002,'02.02.2012','null');
@@ -240,9 +158,6 @@ insert into TPworks values (2008,'04.05.2013','04.05.2014');
 insert into TPworks values (2015,'02.02.2012','09.28.2014');
 insert into TPworks values (2020,'02.02.2012','01.07.2015');
 insert into TPworks values (2029,'05.02.2013','12.29.2014');
-
-
---now add in employs 'resPhone-empID-start date'
 insert into employs values (6049566944,2000,'02.02.2012');
 insert into employs values (6049566944,2001,'02.02.2012');
 insert into employs values (6049566944,2009,'02.02.2012');
@@ -280,9 +195,6 @@ insert into employs values (7785688999,2031,'07.02.2013');
 insert into employs values (7785688999,2032,'09.02.2013');
 insert into employs values (7785688999,2033,'02.26.2013');
 insert into employs values (7785688999,2029,'05.02.2013');
-
-	
---now add in likes 'member ID-dish ID'
 insert into likes values(134567,1004);
 insert into likes values(134568,1002);
 insert into likes values(134569,1035);
@@ -308,9 +220,6 @@ insert into likes values(134588,1024);
 insert into likes values(134589,1025);
 insert into likes values(134590,1015);
 insert into likes values(134591,1027);
-
-
---now add in registered 'member ID-restaurant phone'
 insert into registered values(134567,7785688999);
 insert into registered values(134568,7785688999);
 insert into registered values(134569,7785688999);
@@ -336,9 +245,6 @@ insert into registered values(134588,6049566944);
 insert into registered values(134589,6042677899);
 insert into registered values(134590,6042677899);
 insert into registered values(134591,6042677899);
-
-	
---now add in sale 'sale ID-paymentMethod-discount'
 insert into sale values(10000000,'Cash',0.05);
 insert into sale values(10000001,'Visa',0.03);
 insert into sale values(10000002,'MasterCard',0.03);
@@ -349,7 +255,6 @@ insert into sale values(10000006,'Visa',0.10);
 insert into sale values(10000007,'Cash',0.10);
 insert into sale values(10000008,'MasterCard',0.05);
 insert into sale values(10000009,'Cash',0.03);
-
 insert into sale values(10000010,'MasterCard',0.05);
 insert into sale values(10000011,'Cash',0.06);
 insert into sale values(10000012,'Visa',0.10);
@@ -360,9 +265,6 @@ insert into sale values(10000016,'Cash',0.08);
 insert into sale values(10000017,'American Express',0.06);
 insert into sale values(10000018,'Visa',0.06);
 insert into sale values(10000019,'MasterCard',0.05);
-
-	
---now add in supply 'supply ID-supplyName'
 insert into supply values(100001,'Irish Coffee');
 insert into supply values(100002,'Fresh Leeks');
 insert into supply values(100003,'Fresh Tomatoes');
@@ -373,7 +275,6 @@ insert into supply values(100007,'Sea Clams');
 insert into supply values(100008,'Fresh Lettuce');
 insert into supply values(100009,'Sea Halibut');
 insert into supply values(100010,'Wild Salmon');
-
 insert into supply values(100011,'Tilapia');
 insert into supply values(100012,'Catfish');
 insert into supply values(100013,'Pacific Tuna');
@@ -384,15 +285,11 @@ insert into supply values(100017,'California Apples');
 insert into supply values(100018,'Egglants');
 insert into supply values(100019,'Capers');
 insert into supply values(100020,'Mussels');
-
-	
---now add in supplier 'supplier ID-supplyName'
 insert into supplier values(10001,'BC Liqueur Store');
 insert into supplier values(10002,'Fresh Veggies');
 insert into supplier values(10003,'Mark Arngoltz');
 insert into supplier values(10004,'Steven Stony');
 insert into supplier values(10005,'Kristofer La Manche');
-
 insert into supplier values(10006,'BC Farms');
 insert into supplier values(10007,'Safeway');
 insert into supplier values(10008,'BC Produce');

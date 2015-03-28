@@ -34,6 +34,9 @@
 	<form method="POST">
 		<input type="submit" value="Reset Database" name="reset"></p>
 	</form>
+	<form method="POST">
+		<input type="submit" value="Repopulate Database" name="repopulate"></p>
+	</form>
 	
 	<!--Tabbed interface-->
 	<div id="tabs">
@@ -841,7 +844,20 @@
 
 				// save database
 				OCICommit($db_conn);
+			} elseif (array_key_exists('repopulate', $_POST)){
 				
+				$theFile = fopen("restaurant.sql", "r");
+				if ($theFile) {
+					while (($line = fgets($theFile)) !== false) {
+						$toRun = str_replace(';', '', $line);
+						//echo $toRun."<br />";
+						executePlainSQL($toRun);
+					}
+					fclose($theFile);
+				} else {
+					// error opening the file.
+				}
+				OCICommit($db_conn);
 			} elseif (array_key_exists('addMember', $_POST)) { //If addMember button clicked
 				$tuple = array ( //generate a new tuple
 					":bind1" => $_POST['memberID'],
@@ -1008,7 +1024,7 @@
 				$tuple = array ( //generate a new tuple
 					":bind1" => $_POST['purchaseID'],
 					":bind2" => $_POST['supplierID'],
-					":bind3" => $_POST['suppliesID']
+					":bind3" => $_POST['supplyID']
 				);
 				$alltuples = array ( //wrap the tuple into an array
 					$tuple
