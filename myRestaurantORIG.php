@@ -102,7 +102,7 @@
 				$result = executePlainSQL("select * from member");
 			
 				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<tr><td>ID</td><td>Name</td><td>Phone</td><td>Address</td><td>Discount Rate</td></tr></thead>";
+				$toDisplay = $toDisplay."<tr><td>ID</td><td>Name</td><td>Phone</td><td>Address</td><td>Discount Rate</td></tr>";
 			
 			
 				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
@@ -199,13 +199,13 @@
 				$result = executePlainSQL("select * from likes");
 				
 				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<thead><tr><th>Member ID</th><th>Dish ID</th></tr></thead>";
+				$toDisplay = $toDisplay."<tr><td>Member ID</td><td>Dish ID</td></tr>";
 				
 				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-					$toDisplay = $toDisplay."<tbody><tr>";
+					$toDisplay = $toDisplay."<tr>";
 					$toDisplay = $toDisplay."<td>".$row["MEMBERID"]."</td>";
 					$toDisplay = $toDisplay."<td>".$row["DISHID"]."</td>";
-					$toDisplay = $toDisplay."</tbody></tr>";
+					$toDisplay = $toDisplay."</tr>";
 				}
 				$toDisplay = $toDisplay."</table>";
 			
@@ -284,53 +284,13 @@
 				$result = executePlainSQL("select * from dish");
 			
 				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<thead><tr><th>Dish ID</th><th>Dish Name</th><th>Style</th><th>Price</th></tr></thead>";
+				$toDisplay = $toDisplay."<tr><td>Dish ID</td><td>Dish Name</td><td>Style</td><td>Price</td></tr>";
 			
 			
 				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-					$toDisplay = $toDisplay."<tbody><tr>";
+					$toDisplay = $toDisplay."<tr>";
 					$toDisplay = $toDisplay."<td>".$row["DISHID"]."</td>";
 					$toDisplay = $toDisplay."<td>".$row["DISHNAME"]."</td>";
-					$toDisplay = $toDisplay."<td>".$row["DISHSTYLE"]."</td>";
-					$toDisplay = $toDisplay."<td>".$row["DISHPRICE"]."</td>";
-					$toDisplay = $toDisplay."</tr></tbody>";
-				}
-				$toDisplay = $toDisplay."</table>";
-			
-				return $toDisplay;
-			}
-		?>
-
-		<?php
-			function generateMaximumAveragePriceDisplay(){
-				$toDisplay = "";
-				$result = executePlainSQL("SELECT dishStyle, AVG(dishPrice) as dishPrice FROM dish GROUP BY dishStyle ORDER BY dishPrice DESC");
-				
-				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<thead><tr><th>Dish Style</th><th>Average Dish Price</th></tr></thead><tbody>";
-				
-				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-					$toDisplay = $toDisplay."<tr>";
-					$toDisplay = $toDisplay."<td>".$row["DISHSTYLE"]."</td>";
-					$toDisplay = $toDisplay."<td>".$row["DISHPRICE"]."</td>";
-					$toDisplay = $toDisplay."</tr>";
-				}
-				$toDisplay = $toDisplay."</table>";
-			
-				return $toDisplay;
-			}
-		?>
-
-		<?php
-			function generateMinimumAveragePriceDisplay(){
-				$toDisplay = "";
-				$result = executePlainSQL("SELECT dishStyle, AVG(dishPrice) as dishPrice FROM dish GROUP BY dishStyle ORDER BY dishPrice ASC");
-				
-				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<thead><tr><th>Dish Style</th><th>Average Dish Price</th></tr></thead><tbody>";
-				
-				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-					$toDisplay = $toDisplay."<tr>";
 					$toDisplay = $toDisplay."<td>".$row["DISHSTYLE"]."</td>";
 					$toDisplay = $toDisplay."<td>".$row["DISHPRICE"]."</td>";
 					$toDisplay = $toDisplay."</tr>";
@@ -341,18 +301,11 @@
 			}
 		?>
 		<div id="dishDisplay"></div> <!-- Dish display area-->
-		<br />
-		<strong>Dish style by (descending) average price</strong>
-		<div id="dishMaximumAverageDisplay"></div> <!-- Dish display area-->
-		<br />
-		<strong>Dish style by (ascending) average price</strong>
-		<div id="dishMinimumAverageDisplay"></div> <!-- Dish display area-->
 	</div>
 	
 	
 	<!--Restaurant-->
 	<div id="tab-Restaurant">
-		<b>Add Restaurant</b>
 		<form method="POST"> <!-- Restaurant form-->
 		
 			<input type="text" name="restaurantPhone" size="6" placeholder="Phone #">
@@ -360,24 +313,8 @@
 			<input type="text" name="restaurantLocation" size="6" placeholder="Address">
 			<input type="submit" value="Add Restaurant" name="addRestaurant">
 		</form>
-		
-		<br />
-		<b>Edit Restaurant Name</b>
-		<form method="POST"> <!-- Restaurant Name Edit form-->
-		
-			<input type="text" name="restaurantName_old" size="6" placeholder="Original Name">
-			<input type="text" name="restaurantName_new" size="6" placeholder="New Name">
-			<input type="submit" value="Update Name" name="changeRestaurantName">
-		</form>
-		<div id="restaurantNameChangeDisplay"></div> <!-- Restaurant display area-->
-		
-		<br />
-		<div id="restaurantDisplay"></div> <!-- Restaurant display area-->
-		
-		
-		
 		<?php
-			function generateRestaurantDisplay() { ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			function generateRestaurantDisplay() {
 				$toDisplay = "";
 				$result = executePlainSQL("select * from restaurant");
 			
@@ -397,18 +334,7 @@
 				return $toDisplay;
 			}
 		?>
-		<?php
-			$restaurantNameUpdateResult = "";
-			function generateRestaurantNameUpdateDisplay($oldName, $newName) {
-				$toDisplay = "";
-				executePlainSQL("UPDATE restaurant SET restaurantName='".$newName."' WHERE restaurantName='".$oldName."'");
-				
-				//$restaurantNameUpdateResult = "Name Change Done";
-				
-				return $restaurantNameUpdateResult;
-			}
-		?>
-		
+		<div id="restaurantDisplay"></div> <!-- Restaurant display area-->
 	</div>
 	
 		<!--TPworks-->
@@ -484,12 +410,11 @@
 
 	<!--Sale-->
 	<div id="tab-Sale">
-		<form method="POST"> <!-- Sale form-->
+		<form method="POST"> <!-- Restaurant form-->
 		
 			<input type="text" name="saleID" size="6" placeholder="sale ID">
 			<input type="text" name="paymentMethod" size="6" placeholder="payment method">
 			<input type="text" name="discount" size="6" placeholder="discount rate">
-			<input type="text" name="subtotal" size="6" placeholder="subtotal">
 			<input type="submit" value="Add Sale" name="addSale">
 		</form>
 		<?php
@@ -498,14 +423,13 @@
 				$result = executePlainSQL("select * from sale");
 			
 				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<tr><td>sale ID</td><td>payment method</td><td>subtotal</td><td>discount rate</td></tr>";
+				$toDisplay = $toDisplay."<tr><td>sale ID</td><td>payment method</td><td>discount rate</td></tr>";
 			
 			
 				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 					$toDisplay = $toDisplay."<tr>";
 					$toDisplay = $toDisplay."<td>".$row["SALEID"]."</td>";
 					$toDisplay = $toDisplay."<td>".$row["PAYMENTMETHOD"]."</td>";
-					$toDisplay = $toDisplay."<td>".$row["SUBTOTAL"]."</td>";
 					$toDisplay = $toDisplay."<td>".$row["DISCOUNT"]."</td>";
 					$toDisplay = $toDisplay."</tr>";
 				}
@@ -514,7 +438,7 @@
 				return $toDisplay;
 			}
 		?>
-		<div id="saleDisplay"></div> <!-- sale display area-->
+		<div id="SaleDisplay"></div> <!-- sale display area-->
 	</div>
 	<!-- Supply -->
 	<div id="tab-Supply">
@@ -530,16 +454,16 @@
 				$result = executePlainSQL("select * from supply");
 			
 				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<thead><tr><th>Supply ID</th><th>Supply Name</th></tr></thead>";
+				$toDisplay = $toDisplay."<thead><tr><th>Supply ID</th><th>Supply Name</th></tr></thead><tbody>";
 			
 			
 				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-					$toDisplay = $toDisplay."<tbody><tr>";
+					$toDisplay = $toDisplay."<tr>";
 					$toDisplay = $toDisplay."<td>".$row["SUPPLYID"]."</td>";
 					$toDisplay = $toDisplay."<td>".$row["SUPPLYNAME"]."</td>";
-					$toDisplay = $toDisplay."</tr></tbody>";
+					$toDisplay = $toDisplay."</tr>";
 				}
-				$toDisplay = $toDisplay."</table>";
+				$toDisplay = $toDisplay."</tbody></table>";
 			
 				return $toDisplay;
 			}
@@ -685,12 +609,6 @@
 			<input type="text" name="units" size="10" placeholder="Units">
 			<input type="submit" value="Add Stocks" name="addStocks">
 		</form>
-		<strong>Update Stock</strong><br />
-		<form method="POST"> <!-- Stock update form -->
-			<input type="text" name="supplyID_update" size="6" placeholder="Stock ID">
-			<input type="text" name="update_quantity" size="6" placeholder="New Quantity">
-			<input type="submit" value="Update Stock" name="update_stock">
-		</form>
 		<?php
 			function generateStocksDisplay() {
 				$toDisplay = "";
@@ -713,31 +631,7 @@
 				return $toDisplay;
 			}
 		?>
-
-		<?php
-			function generateMinimumStockDisplay(){
-				$toDisplay = "";
-				$result = executePlainSQL("SELECT SU.supplyID, SU.supplyName, ST.quantity, ST.units FROM supply SU, stocks ST WHERE SU.supplyID=ST.supplyID AND ST.quantity =(SELECT MIN(quantity) FROM stocks)");
-				
-				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<thead><tr><th>Supply ID</th><th>Supply Name</th><th>Supply Quantity</th><th>Units</th></tr></thead><tbody>";
-				
-				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-					$toDisplay = $toDisplay."<tr>";
-					$toDisplay = $toDisplay."<td>".$row["SUPPLYID"]."</td>";
-					$toDisplay = $toDisplay."<td>".$row["SUPPLYNAME"]."</td>";
-					$toDisplay = $toDisplay."<td>".$row["QUANTITY"]."</td>";
-					$toDisplay = $toDisplay."<td>".$row["UNITS"]."</td>";
-					$toDisplay = $toDisplay."</tr>";
-				}
-				$toDisplay = $toDisplay."</table>";
-			
-				return $toDisplay;
-			}
-		?>
 		<div id="StocksDisplay"></div> <!-- Stocks display area-->
-		<strong>Stock with low quantity</strong>
-		<div id="MinimumStockDisplay"></div> <!-- minimum Stock display area -->
 	</div>
 	<!-- end Stocks -->
 
@@ -749,8 +643,6 @@
 			<input type="text" name="supplierID" size="10" placeholder="Supplier ID">
 			<input type="text" name="supplyID" size="10" placeholder="Supply ID">
 			<input type="submit" value="Add Supplies" name="addSupplies">
-			<input type="text" name="searchSupplyID" name="Search Supply">
-			<input type="submit" value="Search Supplies" name="searchSupplies">
 		</form>
 		<?php
 			function generateSuppliesDisplay() {
@@ -773,32 +665,7 @@
 				return $toDisplay;
 			}
 		?>
-
-		<!-- division query to find suppliers supplying a certain supply -->
-		<?php
-			function generateDivideSuppliesDisplay($searchSupplyID){
-				$toDisplay = "";
-
-				$result = executePlainSQL("SELECT SUPPLIERID FROM SUPPLIES GROUP BY SUPPLIERID HAVING COUNT(DISTINCT SUPPLYID)=(SELECT COUNT(DISTINCT SUPPLYID) FROM SUPPLIES)");	
-				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<tr><td>Supplier ID</td></tr>";
-				
-				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-					$toDisplay = $toDisplay."<tr>";
-					$toDisplay = $toDisplay."<td>".$row["SUPPLIERID"]."</td>";
-				
-					$toDisplay = $toDisplay."</tr>";
-				}
-				$toDisplay = $toDisplay."</table>";
-			
-				return $toDisplay;
-			}
-		?>
-		<b>Supplies</b>
 		<div id="SuppliesDisplay"></div> <!-- Supplies display area-->
-		<br />
-		<b>Suppliers that supply a certain supply</b>
-		<div id="DivideSuppliesDisplay"></div> <!-- Supplies Divided display area-->
 	</div>
 	<!-- end Supplies -->
 	<!-- Purchase -->
@@ -926,14 +793,14 @@
 				
 				// Create new table...
 				executePlainSQL("create table member (memberID number, memberName varchar2(30), memberPhone number, memberAddress char(60), memberDiscount number, primary key (memberID))");
-				executePlainSQL("create table restaurant (restaurantPhone number, restaurantName varchar2(30), restaurantLocation char(60), primary key (restaurantPhone), unique (restaurantName))");
+				executePlainSQL("create table restaurant (restaurantPhone number, restaurantName varchar2(30), restaurantLocation char(60), primary key (restaurantPhone))");
 				executePlainSQL("create table dish (dishID number, dishName varchar2(50), dishStyle varchar2(20), dishPrice number, primary key(dishID))");
 				executePlainSQL("create table employee (employeeID number, empName varchar2(30), empPosition varchar2(20), empSalary number,  primary key(employeeID))");
 				executePlainSQL("create table TPworks (employeeID number, startDate varchar2(10), endDate varchar2(10),  primary key(employeeID),foreign key (employeeID) references employee)");				
 				executePlainSQL("create table employs (restaurantPhone number, employeeID number, startDate varchar2(10), primary key(restaurantPhone,employeeID),foreign key (restaurantPhone) references restaurant, foreign key(employeeID) references TPworks)");
  				executePlainSQL("create table likes (memberID number, dishID number, primary key (memberID, dishID), foreign key(memberID) references member on delete cascade, foreign key (dishID) references dish)");
 				executePlainSQL("create table registered (memberID number, restaurantPhone number, primary key (memberID, restaurantPhone), foreign key (memberID) references member on delete cascade, foreign key (restaurantPhone) references restaurant)");
-				executePlainSQL("create table sale (saleID number, paymentMethod varchar2(10), discount number, subtotal number ,primary key(saleID))");
+				executePlainSQL("create table sale (saleID number, paymentMethod varchar2(10), discount number, primary key(saleID))");
 				executePlainSQL("create table supply (supplyID number, supplyName varchar2(20), primary key (supplyID))");
 				executePlainSQL("create table supplier (supplierID number, supplierName varchar2(50), primary key (supplierID))");
 				executePlainSQL("create table includes (saleID number, dishID number, quantity number, primary key (saleID,dishID), foreign key (saleID) references sale, foreign key (dishID) references dish)");
@@ -1008,9 +875,6 @@
 				);
 				executeBoundSQL("insert into restaurant values (:bind1, :bind2, :bind3)", $alltuples);
 				OCICommit($db_conn);
-			} elseif (array_key_exists('changeRestaurantName', $_POST)){ //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-				$restaurantNameUpdateResult = generateRestaurantNameUpdateDisplay($_POST['restaurantName_old'],$_POST['restaurantName_new']);
-				OCICommit($db_conn);
 			} elseif (array_key_exists('addTPworks', $_POST)){
 				$tuple = array ( //generate a new tuple
 					":bind1" => $_POST['employeeID'],
@@ -1038,13 +902,12 @@
 				$tuple = array ( //generate a new tuple
 					":bind1" => $_POST['saleID'],
 					":bind2" => $_POST['paymentMethod'],
-					":bind3" => $_POST['discount'],
-					":bind4" => $_POST['subtotal']
+					":bind3" => $_POST['discount']
 				);
 				$alltuples = array ( //wrap the tuple into an array
 					$tuple
 				);
-				executeBoundSQL("insert into Sale values (:bind1, :bind2, :bind3, :bind4)", $alltuples);
+				executeBoundSQL("insert into Sale values (:bind1, :bind2, :bind3)", $alltuples);
 				OCICommit($db_conn);
 			} elseif (array_key_exists('addSupply', $_POST)) { //If addSupply button clicked
 				$tuple = array ( //generate a new tuple
@@ -1109,14 +972,11 @@
 				);
 				executeBoundSQL("insert into stocks values (:bind1, :bind2, :bind3, :bind4)", $alltuples);
 				OCICommit($db_conn);
-      			} elseif (array_key_exists('update_stock', $_POST)) { //If addMember button clicked
-				executePlainSQL("UPDATE stocks SET quantity=".$_POST['update_quantity']." where supplyID=".$_POST['supplyID_update']);
-				OCICommit($db_conn);
-			} elseif (array_key_exists('addSupplies', $_POST)) { //If addSupplies button clicked
+      			} elseif (array_key_exists('addSupplies', $_POST)) { //If addSupplies button clicked
 				$tuple = array ( //generate a new tuple
 					":bind1" => $_POST['purchaseID'],
 					":bind2" => $_POST['supplierID'],
-					":bind3" => $_POST['supplyID']
+					":bind3" => $_POST['suppliesID']
 				);
 				$alltuples = array ( //wrap the tuple into an array
 					$tuple
@@ -1133,10 +993,7 @@
 				);
 				executeBoundSQL("insert into purchase values (:bind1, :bind2)", $alltuples);
 				OCICommit($db_conn);
-      			} elseif (array_key_exists('searchSupplies', $_POST)){ 
-					$searchSupplyResult = generateDivideSuppliesDisplay($_POST['searchSupplyID']);
-					OCICommit($db_conn);
-				} else { //If the page is just loaded
+      			} else { //If the page is just loaded
 				//Nothing for now
 			}
 		}
@@ -1147,17 +1004,14 @@
 		$("#memberDisplay").html("<?php echo generateMemberDisplay(); ?>");
 		$("#restaurantDisplay").html("<?php echo generateRestaurantDisplay(); ?>");
 		$("#dishDisplay").html("<?php echo generateDishDisplay(); ?>");
-		$("#dishMinimumAverageDisplay").html("<?php echo generateMinimumAveragePriceDisplay(); ?>");
-		$("#dishMaximumAverageDisplay").html("<?php echo generateMaximumAveragePriceDisplay(); ?>");
 		$("#TPworksDisplay").html("<?php echo generateTPworksDisplay(); ?>");
 		$("#EmployeeDisplay").html("<?php echo generateEmployeeDisplay(); ?>");
-		$("#saleDisplay").html("<?php echo generateSaleDisplay(); ?>");
+		$("#SaleDisplay").html("<?php echo generateSaleDisplay(); ?>");
 		$("#SupplyDisplay").html("<?php echo generateSupplyDisplay(); ?>");
 		$("#SupplierDisplay").html("<?php echo generateSupplierDisplay(); ?>");
 		$("#likesDisplay").html("<?php echo generateLikesDisplay(); ?>");
 		$("#registeredDisplay").html("<?php echo generateRegisteredDisplay(); ?>");
 		$("#memberSearchDisplay").html("<?php echo $memberSearchResult; ?>");
-		$("#restaurantNameChangeDisplay").html("<?php echo $restaurantNameUpdateResult; ?>");
 		$("#likesJoinedDisplay").html("<?php echo generateJoinedLikesDisplay(); ?>");
 		$("#IncludesDisplay").html("<?php echo generateIncludesDisplay(); ?>");
 		$("#ServesDisplay").html("<?php echo generateServesDisplay(); ?>");
@@ -1165,8 +1019,7 @@
 		$("#StocksDisplay").html("<?php echo generateStocksDisplay(); ?>");
 		$("#SuppliesDisplay").html("<?php echo generateSuppliesDisplay(); ?>");
 		$("#PurchaseDisplay").html("<?php echo generatePurchaseDisplay(); ?>");
-		$("#MinimumStockDisplay").html("<?php echo generateMinimumStockDisplay(); ?>");
-		$("#DivideSuppliesDisplay").html("<?php echo $searchSupplyResult; ?>");
+		
 	</script>
 </body>
 </html>
