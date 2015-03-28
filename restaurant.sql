@@ -16,6 +16,12 @@ drop table employs cascade constraints;
 drop table sale cascade constraints;
 drop table supply cascade constraints;
 drop table supplier cascade constraints;
+drop table includes cascade constraints;
+drop table serves cascade constraints;
+drop table makes cascade constraints;
+drop table orders cascade constraints;
+drop table stocks cascade constraints;
+drop table supplies cascade constraints;
 
 -- Now, add each table.
 
@@ -26,15 +32,18 @@ create table member(
 	memberAddress char(70),
 	memberDiscount number(3,2)
 	);
+	
 create table restaurant(
 	restaurantPhone number(10,0) primary key,
 	restaurantName varchar2(30),
 	restaurantLocation char(70)
 	);
+	
 create table dish( dishID number(4,0) primary key, 	
 	dishName varchar2(50), 	
 	dishStyle varchar2(20), 
-	dishPrice number(5,2));
+	dishPrice number(5,2)
+	);
 
 create table employee(
 	employeeID number(4,0) primary key,
@@ -42,12 +51,14 @@ create table employee(
 	empPosition varchar2(20),
 	empSalary number(7,2)
 	);
+	
 create table TPworks(
 	employeeID number(5,0) primary key,
 	startDate varchar2(10),
 	endDate varchar2(10),
 	foreign key (employeeID) references employee on delete cascade
 	);
+	
 create table employs(
 	restaurantPhone number(10,0),
 	employeeID number(5,0),
@@ -56,6 +67,7 @@ create table employs(
 	foreign key (restaurantPhone) references restaurant on delete cascade, 
 	foreign key(employeeID) references TPworks on delete cascade
 	);
+	
 create table likes(
 	memberID number(6,0),
 	dishID number(4,0),
@@ -63,24 +75,72 @@ create table likes(
 	foreign key (memberID) references member on delete cascade, 
 	foreign key (dishID) references dish on delete cascade
 	);
+	
 create table registered(
 	memberID number(6,0) primary key,
 	restaurantPhone number(10,0),
 	foreign key (memberID) references member on delete cascade,
 	foreign key (restaurantPhone) references restaurant on delete cascade
 	);
+	
 create table sale(
 	saleID number(8,0) primary key,
 	paymentMethod varchar2(20),
-	discount number(3,2)
+	discount number(3,2),
+	subtotal number(5,2)
 	);
+	
 create table supply(
 	supplyID number(6,0) primary key,
 	supplyName varchar2(20)
 	);
+	
 create table supplier(
 	supplierID number(5,0) primary key,
 	supplierName varchar2(50)
+	);
+	
+create table includes(	saleID number(8,0),	dishID number(4,0),	quantity number (4,0),	primary key (saleID,dishID),	foreign key (saleID) references sale on delete cascade,foreign key (dishID) references dish on delete cascade);
+
+create table serves (	
+	dishID number (4,0),	
+	restaurantPhone number(10,0),	
+	primary key (dishID,restaurantPhone),	
+	foreign key (dishID) references dish on delete cascade,	
+	foreign key (restaurantPhone) references restaurant on delete cascade
+	);
+
+create table makes (
+	restaurantPhone number (10,0),
+	saleID number(8,0),
+	primary key (restaurantPhone,saleID),
+	foreign key (restaurantPhone) references restaurant on delete cascade,
+	foreign key (saleID) references sale on delete cascade
+	);
+
+create table supplies (
+	orderID number (6,0) primary key,
+	supplierID number(5,0),
+	supplyID number(6,0),
+	foreign key (supplierID) references supplier on delete cascade,
+	foreign key (supplyID) references supply on delete cascade
+	);
+
+create table orders (
+	orderID number (6,0) primary key,
+	restaurantPhone number (10,0),
+	foreign key (restaurantPhone) references restaurant on delete cascade,
+	foreign key (orderID) references supplies on delete cascade
+	);
+
+create table stocks (
+	restaurantPhone number (10,0),
+	supplyID number(6,0),
+	quantity number (4,0),
+	units char (15),
+	primary key (restaurantPhone,supplyID),
+	foreign key (restaurantPhone) references restaurant on delete cascade,
+	foreign key (supplyID) references supply on delete cascade
 	);
 
 	
@@ -337,28 +397,28 @@ insert into registered values(134590,6042677899);
 insert into registered values(134591,6042677899);
 
 	
---now add in sale 'sale ID-paymentMethod-discount'
-insert into sale values(10000000,'Cash',0.05);
-insert into sale values(10000001,'Visa',0.03);
-insert into sale values(10000002,'MasterCard',0.03);
-insert into sale values(10000003,'Visa',0.05);
-insert into sale values(10000004,'Visa',0.05);
-insert into sale values(10000005,'American Express',0.08);
-insert into sale values(10000006,'Visa',0.10);
-insert into sale values(10000007,'Cash',0.10);
-insert into sale values(10000008,'MasterCard',0.05);
-insert into sale values(10000009,'Cash',0.03);
+--now add in sale 'sale ID-paymentMethod-discount-subtotal'
+insert into sale values(10000000,'Cash',0.05,28.47); 
+insert into sale values(10000001,'Visa',0.00,59.94);
+insert into sale values(10000002,'MasterCard',0.03,25.18);
+insert into sale values(10000003,'Visa',0.00,29.97);
+insert into sale values(10000004,'Visa',0.00,42.95);
+insert into sale values(10000005,'American Express',0.08,18.38);
+insert into sale values(10000006,'Visa',0.10,37.76);
+insert into sale values(10000007,'Cash',0.00,23.98);
+insert into sale values(10000008,'MasterCard',0.05,20.87);
+insert into sale values(10000009,'Cash',0.03,44.57);
 
-insert into sale values(10000010,'MasterCard',0.05);
-insert into sale values(10000011,'Cash',0.06);
-insert into sale values(10000012,'Visa',0.10);
-insert into sale values(10000013,'Cash',0.05);
-insert into sale values(10000014,'American Express',0.05);
-insert into sale values(10000015,'Cash',0.03);
-insert into sale values(10000016,'Cash',0.08);
-insert into sale values(10000017,'American Express',0.06);
-insert into sale values(10000018,'Visa',0.06);
-insert into sale values(10000019,'MasterCard',0.05);
+insert into sale values(10000010,'MasterCard',0.05,22.78);
+insert into sale values(10000011,'Cash',0.06,22.54);
+insert into sale values(10000012,'Visa',0.10,60.23);
+insert into sale values(10000013,'Cash',0.05,30.37);
+insert into sale values(10000014,'American Express',0.05,30.37);
+insert into sale values(10000015,'Cash',0.03,18.41);
+insert into sale values(10000016,'Cash',0.00,66.93);
+insert into sale values(10000017,'American Express',0.06,28.17);
+insert into sale values(10000018,'Visa',0.06,15.02);
+insert into sale values(10000019,'MasterCard',0.05,47.45);
 
 	
 --now add in supply 'supply ID-supplyName'
@@ -397,3 +457,264 @@ insert into supplier values(10007,'Safeway');
 insert into supplier values(10008,'BC Produce');
 insert into supplier values(10009,'Farmer Market');
 insert into supplier values(10010,'Save on Foods');
+
+
+--now add in includes 'sale ID-dish ID-Quantity'
+insert into includes values(10000000,1001,1);
+insert into includes values(10000000,1010,1);
+insert into includes values(10000000,1031,1);
+insert into includes values(10000001,1002,2);
+insert into includes values(10000001,1020,1);
+insert into includes values(10000001,1025,1);
+insert into includes values(10000001,1034,2);
+
+insert into includes values(10000002,1012,1);
+insert into includes values(10000002,1011,1);
+insert into includes values(10000002,1026,1);
+insert into includes values(10000002,1032,1);
+insert into includes values(10000003,1008,1);
+insert into includes values(10000003,1022,1);
+insert into includes values(10000003,1028,1);
+
+insert into includes values(10000004,1018,2);
+insert into includes values(10000004,1023,1);
+insert into includes values(10000004,1026,1);
+insert into includes values(10000004,1033,1);
+insert into includes values(10000005,1016,1);
+insert into includes values(10000005,1024,1);
+
+insert into includes values(10000006,1005,1);
+insert into includes values(10000006,1021,1);
+insert into includes values(10000006,1030,1);
+insert into includes values(10000006,1025,1);
+insert into includes values(10000007,1029,1);
+insert into includes values(10000007,1008,1);
+
+
+--now add in serves 'dish ID-restaurantPhone'
+--restaurant 1
+insert into serves values(1001,7785688999);
+insert into serves values(1002,7785688999);
+insert into serves values(1003,7785688999);
+insert into serves values(1004,7785688999);
+insert into serves values(1005,7785688999);
+insert into serves values(1035,7785688999);
+insert into serves values(1006,7785688999);
+insert into serves values(1007,7785688999);
+insert into serves values(1008,7785688999);
+insert into serves values(1009,7785688999);
+insert into serves values(1015,7785688999);
+insert into serves values(1016,7785688999);
+insert into serves values(1017,7785688999);
+insert into serves values(1018,7785688999);
+insert into serves values(1019,7785688999);
+insert into serves values(1010,7785688999);
+insert into serves values(1011,7785688999);
+insert into serves values(1012,7785688999);
+insert into serves values(1013,7785688999);
+insert into serves values(1014,7785688999);
+insert into serves values(1020,7785688999);
+insert into serves values(1021,7785688999);
+insert into serves values(1022,7785688999);
+insert into serves values(1023,7785688999);
+insert into serves values(1024,7785688999);
+insert into serves values(1025,7785688999);
+insert into serves values(1026,7785688999);
+insert into serves values(1027,7785688999);
+insert into serves values(1028,7785688999);
+insert into serves values(1029,7785688999);
+insert into serves values(1030,7785688999);
+insert into serves values(1031,7785688999);
+insert into serves values(1032,7785688999);
+insert into serves values(1033,7785688999);
+insert into serves values(1034,7785688999);
+--restaurant 2
+insert into serves values(1001,6049566944);
+insert into serves values(1002,6049566944);
+insert into serves values(1003,6049566944);
+insert into serves values(1004,6049566944);
+insert into serves values(1005,6049566944);
+insert into serves values(1035,6049566944);
+insert into serves values(1006,6049566944);
+insert into serves values(1007,6049566944);
+insert into serves values(1008,6049566944);
+insert into serves values(1009,6049566944);
+insert into serves values(1015,6049566944);
+insert into serves values(1016,6049566944);
+insert into serves values(1017,6049566944);
+insert into serves values(1018,6049566944);
+insert into serves values(1019,6049566944);
+insert into serves values(1010,6049566944);
+insert into serves values(1011,6049566944);
+insert into serves values(1012,6049566944);
+insert into serves values(1013,6049566944);
+insert into serves values(1014,6049566944);
+insert into serves values(1020,6049566944);
+insert into serves values(1021,6049566944);
+insert into serves values(1022,6049566944);
+insert into serves values(1023,6049566944);
+insert into serves values(1024,6049566944);
+insert into serves values(1025,6049566944);
+insert into serves values(1026,6049566944);
+insert into serves values(1027,6049566944);
+insert into serves values(1028,6049566944);
+insert into serves values(1029,6049566944);
+insert into serves values(1030,6049566944);
+insert into serves values(1031,6049566944);
+insert into serves values(1032,6049566944);
+insert into serves values(1033,6049566944);
+insert into serves values(1034,6049566944);
+--restaurant 3
+insert into serves values(1001,6042677899);
+insert into serves values(1002,6042677899);
+insert into serves values(1003,6042677899);
+insert into serves values(1004,6042677899);
+insert into serves values(1005,6042677899);
+insert into serves values(1035,6042677899);
+insert into serves values(1006,6042677899);
+insert into serves values(1007,6042677899);
+insert into serves values(1008,6042677899);
+insert into serves values(1009,6042677899);
+insert into serves values(1015,6042677899);
+insert into serves values(1016,6042677899);
+insert into serves values(1017,6042677899);
+insert into serves values(1018,6042677899);
+insert into serves values(1019,6042677899);
+insert into serves values(1010,6042677899);
+insert into serves values(1011,6042677899);
+insert into serves values(1012,6042677899);
+insert into serves values(1013,6042677899);
+insert into serves values(1014,6042677899);
+insert into serves values(1020,6042677899);
+insert into serves values(1021,6042677899);
+insert into serves values(1022,6042677899);
+insert into serves values(1023,6042677899);
+insert into serves values(1024,6042677899);
+insert into serves values(1025,6042677899);
+insert into serves values(1026,6042677899);
+insert into serves values(1027,6042677899);
+insert into serves values(1028,6042677899);
+insert into serves values(1029,6042677899);
+insert into serves values(1030,6042677899);
+insert into serves values(1031,6042677899);
+insert into serves values(1032,6042677899);
+insert into serves values(1033,6042677899);
+insert into serves values(1034,6042677899);
+--restaurant 4
+insert into serves values(1001,6049700900);
+insert into serves values(1002,6049700900);
+insert into serves values(1003,6049700900);
+insert into serves values(1004,6049700900);
+insert into serves values(1005,6049700900);
+insert into serves values(1035,6049700900);
+insert into serves values(1006,6049700900);
+insert into serves values(1007,6049700900);
+insert into serves values(1008,6049700900);
+insert into serves values(1009,6049700900);
+insert into serves values(1015,6049700900);
+insert into serves values(1016,6049700900);
+insert into serves values(1017,6049700900);
+insert into serves values(1018,6049700900);
+insert into serves values(1019,6049700900);
+insert into serves values(1010,6049700900);
+insert into serves values(1011,6049700900);
+insert into serves values(1012,6049700900);
+insert into serves values(1013,6049700900);
+insert into serves values(1014,6049700900);
+insert into serves values(1020,6049700900);
+insert into serves values(1021,6049700900);
+insert into serves values(1022,6049700900);
+insert into serves values(1023,6049700900);
+insert into serves values(1024,6049700900);
+insert into serves values(1025,6049700900);
+insert into serves values(1026,6049700900);
+insert into serves values(1027,6049700900);
+insert into serves values(1028,6049700900);
+insert into serves values(1029,6049700900);
+insert into serves values(1030,6049700900);
+insert into serves values(1031,6049700900);
+insert into serves values(1032,6049700900);
+insert into serves values(1033,6049700900);
+insert into serves values(1034,6049700900);
+
+
+-- now add in makes 'restaurantPhone - sale ID'
+insert into makes values(7785688999,10000000);
+insert into makes values(7785688999,10000001);
+insert into makes values(6049566944,10000002);
+insert into makes values(6049566944,10000003);
+insert into makes values(6042677899,10000004);
+insert into makes values(6042677899,10000005);
+insert into makes values(6049700900,10000006);
+insert into makes values(6049700900,10000007);
+
+
+--now add in supplies 'orderID - supplier ID - supply ID'
+insert into supplies values(200001,10010,100001);
+insert into supplies values(200002,10002,100002);
+insert into supplies values(200003,10002,100003);
+insert into supplies values(200004,10007,100004);
+insert into supplies values(200005,10001,100005);
+insert into supplies values(200006,10003,100006);
+insert into supplies values(200007,10003,100007);
+insert into supplies values(200008,10006,100008);
+insert into supplies values(200009,10004,100009);
+insert into supplies values(200010,10004,100010);
+
+insert into supplies values(200011,10005,100011);
+insert into supplies values(200012,10005,100012);
+insert into supplies values(200013,10004,100013);
+insert into supplies values(200014,10007,100014);
+insert into supplies values(200015,10001,100015);
+insert into supplies values(200016,10007,100016);
+insert into supplies values(200017,10002,100017);
+insert into supplies values(200018,10006,100018);
+insert into supplies values(200019,10010,100019);
+insert into supplies values(200020,10003,100020);
+
+
+--now add in orders 'orderID - restaurantPhone'
+insert into orders values(200001,7785688999);
+insert into orders values(200002,7785688999);
+insert into orders values(200003,7785688999);
+insert into orders values(200004,7785688999);
+insert into orders values(200005,7785688999);
+insert into orders values(200006,6049566944);
+insert into orders values(200007,6049566944);
+insert into orders values(200008,6049566944);
+insert into orders values(200009,6049566944);
+insert into orders values(200010,6049566944);
+insert into orders values(200011,6042677899);
+insert into orders values(200012,6042677899);
+insert into orders values(200013,6042677899);
+insert into orders values(200014,6042677899);
+insert into orders values(200015,6042677899);
+insert into orders values(200016,6049700900);
+insert into orders values(200017,6049700900);
+insert into orders values(200018,6049700900);
+insert into orders values(200019,6049700900);
+insert into orders values(200020,6049700900);
+
+
+--now add in stocks 'restaurantPhone - supplyID - quantity - units'
+insert into stocks values(7785688999,100001,2,'jar(s)');
+insert into stocks values(7785688999,100002,4,'bunch(es)');
+insert into stocks values(7785688999,100003,3,'pound(s)');
+insert into stocks values(7785688999,100004,5,'container(s)');
+insert into stocks values(7785688999,100005,2,'bottle(s)');
+insert into stocks values(6049566944,100006,4,'pound(s)');
+insert into stocks values(6049566944,100007,8,'pound(s)');
+insert into stocks values(6049566944,100008,3,'bunch(es)');
+insert into stocks values(6049566944,100009,30,'pound(s)');
+insert into stocks values(6049566944,100010,30,'pound(s)');
+
+insert into stocks values(6042677899,100011,20,'pound(s)');
+insert into stocks values(6042677899,100012,15,'pound(s)');
+insert into stocks values(6042677899,100013,35,'pound(s)');
+insert into stocks values(6042677899,100014,10,'bar(s)');
+insert into stocks values(6042677899,100015,3,'bottle(s)');
+insert into stocks values(6049700900,100016,6,'tin(s)');
+insert into stocks values(6049700900,100017,4,'pound(s)');
+insert into stocks values(6049700900,100018,6,'pound(s)');
+insert into stocks values(6049700900,100019,2,'jar(s)');
+insert into stocks values(6049700900,100020,10,'pound(s)');
