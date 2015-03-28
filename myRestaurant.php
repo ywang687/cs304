@@ -14,8 +14,8 @@
 		</script>
 		<?php 
 			// Database log-in information
-			$databaseUserName="ora_z6j7";
-			$databasePassword="a72495096";
+			$databaseUserName="ora_u0j8";
+			$databasePassword="a45777109";
 			
 			$success = True; //keep track of errors so it redirects the page only if there are no errors
 			$db_conn = OCILogon($databaseUserName, $databasePassword, "ug");
@@ -467,7 +467,7 @@
 				return $toDisplay;
 			}
 		?>
-		<div id="SaleDisplay"></div> <!-- sale display area-->
+		<div id="saleDisplay"></div> <!-- sale display area-->
 	</div>
 	<!-- Supply -->
 	<div id="tab-Supply">
