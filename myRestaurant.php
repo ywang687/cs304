@@ -14,8 +14,8 @@
 		</script>
 		<?php 
 			// Database log-in information
-			$databaseUserName="ora_u0j8";
-			$databasePassword="a45777109";
+			$databaseUserName="ora_z6j7";
+			$databasePassword="a72495096";
 			
 			$success = True; //keep track of errors so it redirects the page only if there are no errors
 			$db_conn = OCILogon($databaseUserName, $databasePassword, "ug");
@@ -43,11 +43,17 @@
 			<li><a href="#tab-Registered">Registered</a></li>
 			<li><a href="#tab-Dish">Dish</a></li>
 			<li><a href="#tab-Sale">Sale</a></li>
+			<li><a href="#tab-Includes">Includes</a></li>
+			<li><a href="#tab-Serves">Serves</a></li>
+			<li><a href="#tab-Makes">Makes</a></li>
 			<li><a href="#tab-Restaurant">Restaurant</a></li>
 			<li><a href="#tab-TPworks">TPworks</a></li>
 			<li><a href="#tab-Employee">Employee</a></li>
 			<li><a href="#tab-Supply">Supply</a></li>
 			<li><a href="#tab-Supplier">Supplier</a></li>
+			<li><a href="#tab-Stocks">Stocks</a></li>
+			<li><a href="#tab-Purchase">Purchase</a></li>
+			<li><a href="#tab-Supplies">Supplies</a></li>
 			
 		</ul>
 	
@@ -461,7 +467,7 @@
 				return $toDisplay;
 			}
 		?>
-		<div id="saleDisplay"></div> <!-- sale display area-->
+		<div id="SaleDisplay"></div> <!-- sale display area-->
 	</div>
 	<!-- Supply -->
 	<div id="tab-Supply">
@@ -527,6 +533,202 @@
 	</div>
 	<!-- end Supplier -->
 	
+	<!--Includes-->
+	<div id="tab-Includes">
+		<form method="POST"> <!-- Restaurant form-->
+		
+			<input type="text" name="saleID" size="6" placeholder="sale ID">
+			<input type="text" name="dishID" size="6" placeholder="dish ID">
+			<input type="text" name="quantity" size="6" placeholder="quantity">
+			<input type="submit" value="Add Includes" name="addIncludes">
+		</form>
+		<?php
+			function generateIncludesDisplay() {
+				$toDisplay = "";
+				$result = executePlainSQL("select * from Includes");
+			
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<tr><td>sale ID</td><td>dish ID</td><td>quantity</td></tr>";
+			
+			
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<td>".$row["SALEID"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["DISHID"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["QUANTITY"]."</td>";
+					$toDisplay = $toDisplay."</tr>";
+				}
+				$toDisplay = $toDisplay."</table>";
+			
+				return $toDisplay;
+			}
+		?>
+		<div id="IncludesDisplay"></div> <!-- includes display area-->
+	</div>
+
+	<!--Serves-->
+	<div id="tab-Serves">
+		<form method="POST"> <!-- Restaurant form-->
+		
+			<input type="text" name="dishID" size="6" placeholder="dish ID">
+			<input type="text" name="restaurantPhone" size="6" placeholder="restaurant Phone Number">
+			<input type="submit" value="Add Serves" name="addServes">
+		</form>
+		<?php
+			function generateServesDisplay() {
+				$toDisplay = "";
+				$result = executePlainSQL("select * from Serves");
+			
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<tr><td>dish ID</td><td>restaurant Phone Number</td></tr>";
+			
+			
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<td>".$row["DISHID"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["RESTAURANTPHONE"]."</td>";
+					$toDisplay = $toDisplay."</tr>";
+				}
+				$toDisplay = $toDisplay."</table>";
+			
+				return $toDisplay;
+			}
+		?>
+		<div id="ServesDisplay"></div> <!-- serves display area-->
+	</div>
+
+	<!--Makes-->
+	<div id="tab-Makes">
+		<form method="POST"> <!-- Restaurant form-->
+		
+			<input type="text" name="restaurantPhone" size="6" placeholder="restaurant Phone Number">
+			<input type="text" name="saleID" size="6" placeholder="sale ID">
+			<input type="submit" value="Add Makes" name="addMakes">
+		</form>
+		<?php
+			function generateMakesDisplay() {
+				$toDisplay = "";
+				$result = executePlainSQL("select * from Makes");
+			
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<tr><td>restaurant Phone Number</td><td>Sale ID</td></tr>";
+			
+			
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<td>".$row["RESTAURANTPHONE"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["SALEID"]."</td>";
+					$toDisplay = $toDisplay."</tr>";
+				}
+				$toDisplay = $toDisplay."</table>";
+			
+				return $toDisplay;
+			}
+		?>
+		<div id="MakesDisplay"></div> <!-- makes display area-->
+	</div>
+
+	<!-- Stocks -->
+	<div id="tab-Stocks">
+		<form method="POST"> <!-- Stocks form-->
+	
+			<input type="text" name="restaurantPhone" size="15" placeholder="Restaurant Phone">
+			<input type="text" name="supplyID" size="8" placeholder="Supply ID">
+			<input type="text" name="quantity" size="10" placeholder="Quantity">
+			<input type="text" name="units" size="10" placeholder="Units">
+			<input type="submit" value="Add Stocks" name="addStocks">
+		</form>
+		<?php
+			function generateStocksDisplay() {
+				$toDisplay = "";
+				$result = executePlainSQL("select * from stocks");
+			
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<thead><tr><th>Restaurant Phone ID</th><th>Supply ID</th><th>Quantity</th><th>Units</th></tr></thead><tbody>";
+			
+			
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<td>".$row["RESTAURANTPHONE"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["SUPPLYID"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["QUANTITY"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["UNITS"]."</td>";
+					$toDisplay = $toDisplay."</tr>";
+				}
+				$toDisplay = $toDisplay."</tbody></table>";
+			
+				return $toDisplay;
+			}
+		?>
+		<div id="StocksDisplay"></div> <!-- Stocks display area-->
+	</div>
+	<!-- end Stocks -->
+
+	<!-- Supplies -->
+	<div id="tab-Supplies">
+		<form method="POST"> <!-- Supplies form-->
+	
+			<input type="text" name="purchaseID" size="8" placeholder="Purchase ID">
+			<input type="text" name="supplierID" size="10" placeholder="Supplier ID">
+			<input type="text" name="supplyID" size="10" placeholder="Supply ID">
+			<input type="submit" value="Add Supplies" name="addSupplies">
+		</form>
+		<?php
+			function generateSuppliesDisplay() {
+				$toDisplay = "";
+				$result = executePlainSQL("select * from supplies");
+			
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<thead><tr><th>Purchase ID</th><th>Supplier ID</th><th>Supply ID</th></tr></thead><tbody>";
+			
+			
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<td>".$row["PURCHASEID"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["SUPPLIERID"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["SUPPLYID"]."</td>";
+					$toDisplay = $toDisplay."</tr>";
+				}
+				$toDisplay = $toDisplay."</tbody></table>";
+			
+				return $toDisplay;
+			}
+		?>
+		<div id="SuppliesDisplay"></div> <!-- Supplies display area-->
+	</div>
+	<!-- end Supplies -->
+	<!-- Purchase -->
+	<div id="tab-Purchase">
+		<form method="POST"> <!-- Purchase form-->
+	
+			<input type="text" name="purchaseID" size="8" placeholder="Purchase ID">
+			<input type="text" name="restaurantPhone" size="15" placeholder="Restaurant Phone">
+			<input type="submit" value="Add Purchase" name="addPurchase">
+		</form>
+		<?php
+			function generatePurchaseDisplay() {
+				$toDisplay = "";
+				$result = executePlainSQL("select * from purchase");
+			
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<thead><tr><th>Purchase ID</th><th>Restaurant Phone</th></tr></thead><tbody>";
+			
+			
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<td>".$row["PURCHASEID"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["RESTAURANTPHONE"]."</td>";
+					$toDisplay = $toDisplay."</tr>";
+				}
+				$toDisplay = $toDisplay."</tbody></table>";
+			
+				return $toDisplay;
+			}
+		?>
+		<div id="PurchaseDisplay"></div> <!-- Purchase display area-->
+	</div>
+	<!-- end Purchase -->
+
 	</div>
 	
 	
@@ -608,6 +810,14 @@
 				executePlainSQL("Drop table sale cascade constraints");
 				executePlainSQL("Drop table supply cascade constraints");
 				executePlainSQL("Drop table supplier cascade constraints");
+				executePlainSQL("Drop table includes cascade constraints");
+				executePlainSQL("Drop table serves cascade constraints");
+				executePlainSQL("Drop table makes cascade constraints");
+				executePlainSQL("Drop table stocks cascade constraints");
+				executePlainSQL("Drop table supplies cascade constraints");
+				executePlainSQL("Drop table purchase cascade constraints");
+
+
 				
 				
 				// Create new table...
@@ -622,7 +832,12 @@
 				executePlainSQL("create table sale (saleID number, paymentMethod varchar2(10), discount number, subtotal number ,primary key(saleID))");
 				executePlainSQL("create table supply (supplyID number, supplyName varchar2(20), primary key (supplyID))");
 				executePlainSQL("create table supplier (supplierID number, supplierName varchar2(50), primary key (supplierID))");
-			
+				executePlainSQL("create table includes (saleID number, dishID number, quantity number, primary key (saleID,dishID), foreign key (saleID) references sale, foreign key (dishID) references dish)");
+				executePlainSQL("create table serves (dishID number, restaurantPhone number, primary key (dishID,restaurantPhone), foreign key (dishID) references dish, foreign key (restaurantPhone) references restaurant)");
+				executePlainSQL("create table makes (restaurantPhone number, saleID number, primary key (saleID,restaurantPhone), foreign key (saleID) references sale, foreign key (restaurantPhone) references restaurant)");
+				executePlainSQL("create table stocks (restaurantPhone number, supplyID number, quantity number, units varchar(10), primary key (restaurantPhone, supplyID), foreign key(supplyID) references supply, foreign key(restaurantPhone) references restaurant)");
+				executePlainSQL("create table supplies (purchaseID number, supplierID number, supplyID number, primary key (purchaseID), foreign key(supplierID) references supplier, foreign key(supplyID) references supply)");
+				executePlainSQL("create table purchase (purchaseID number, restaurantPhone number, primary key (purchaseID), foreign key(purchaseID) references supplies, foreign key(restaurantPhone) references restaurant)");
 
 				// save database
 				OCICommit($db_conn);
@@ -746,6 +961,70 @@
 				);
 				executeBoundSQL("insert into supplier values (:bind1, :bind2)", $alltuples);
 				OCICommit($db_conn);
+      			} elseif (array_key_exists('addIncludes', $_POST)){
+				$tuple = array ( //generate a new tuple
+					":bind1" => $_POST['saleID'],
+					":bind2" => $_POST['dishID'],
+					":bind3" => $_POST['quantity']
+				);
+				$alltuples = array ( //wrap the tuple into an array
+					$tuple
+				);
+				executeBoundSQL("insert into includes values (:bind1, :bind2, :bind3)", $alltuples);
+				OCICommit($db_conn);
+			} elseif (array_key_exists('addServes', $_POST)){
+				$tuple = array ( //generate a new tuple
+					":bind1" => $_POST['dishID'],
+					":bind2" => $_POST['restaurantPhone'],
+				);
+				$alltuples = array ( //wrap the tuple into an array
+					$tuple
+				);
+				executeBoundSQL("insert into serves values (:bind1, :bind2)", $alltuples);
+				OCICommit($db_conn);
+			} elseif (array_key_exists('addMakes', $_POST)){
+				$tuple = array ( //generate a new tuple
+					":bind1" => $_POST['restaurantPhone'],
+					":bind2" => $_POST['saleID'],
+				);
+				$alltuples = array ( //wrap the tuple into an array
+					$tuple
+				);
+				executeBoundSQL("insert into makes values (:bind1, :bind2)", $alltuples);
+				OCICommit($db_conn);
+			} elseif (array_key_exists('addStocks', $_POST)) { //If addStocks button clicked
+				$tuple = array ( //generate a new tuple
+					":bind1" => $_POST['restaurantPhone'],
+					":bind2" => $_POST['supplyID'],
+					":bind3" => $_POST['quantity'],
+					":bind4" => $_POST['units']
+				);
+				$alltuples = array ( //wrap the tuple into an array
+					$tuple
+				);
+				executeBoundSQL("insert into stocks values (:bind1, :bind2, :bind3, :bind4)", $alltuples);
+				OCICommit($db_conn);
+      			} elseif (array_key_exists('addSupplies', $_POST)) { //If addSupplies button clicked
+				$tuple = array ( //generate a new tuple
+					":bind1" => $_POST['purchaseID'],
+					":bind2" => $_POST['supplierID'],
+					":bind3" => $_POST['suppliesID']
+				);
+				$alltuples = array ( //wrap the tuple into an array
+					$tuple
+				);
+				executeBoundSQL("insert into supplies values (:bind1, :bind2, :bind3)", $alltuples);
+				OCICommit($db_conn);
+      			} elseif (array_key_exists('addPurchase', $_POST)) { //If addPurchase button clicked
+				$tuple = array ( //generate a new tuple
+					":bind1" => $_POST['purchaseID'],
+					":bind2" => $_POST['restaurantPhone']
+				);
+				$alltuples = array ( //wrap the tuple into an array
+					$tuple
+				);
+				executeBoundSQL("insert into purchase values (:bind1, :bind2)", $alltuples);
+				OCICommit($db_conn);
       			} else { //If the page is just loaded
 				//Nothing for now
 			}
@@ -767,6 +1046,12 @@
 		$("#memberSearchDisplay").html("<?php echo $memberSearchResult; ?>");
 		$("#restaurantNameChangeDisplay").html("<?php echo $restaurantNameUpdateResult; ?>");
 		$("#likesJoinedDisplay").html("<?php echo generateJoinedLikesDisplay(); ?>");
+		$("#IncludesDisplay").html("<?php echo generateIncludesDisplay(); ?>");
+		$("#ServesDisplay").html("<?php echo generateServesDisplay(); ?>");
+		$("#MakesDisplay").html("<?php echo generateMakesDisplay(); ?>");
+		$("#StocksDisplay").html("<?php echo generateStocksDisplay(); ?>");
+		$("#SuppliesDisplay").html("<?php echo generateSuppliesDisplay(); ?>");
+		$("#PurchaseDisplay").html("<?php echo generatePurchaseDisplay(); ?>");
 		
 	</script>
 </body>

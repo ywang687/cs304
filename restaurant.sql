@@ -149,7 +149,7 @@ insert into dish values(1022,'Cream of Potato and Leek caramelized','French',6.9
 insert into dish values(1023,'Mussels in White Wine','Canadian',6.99);
 insert into dish values(1024,'Thai Coconut Soup with Chicken and Coriander','Thai',5.99);
 --desserts
-insert into dish values(1025,'Kirsch Soufflé','German',5.99);
+insert into dish values(1025,'Kirsch Souffle','German',5.99);
 insert into dish values(1026,'Apple Trifle with Mascarpone Cream','French',5.99);
 insert into dish values(1027,'Orange Dessert with Vanilla Cream','French',4.99);
 insert into dish values(1028,'Hot Chocolate Galettes','Polish',3.99);
