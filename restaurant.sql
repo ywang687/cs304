@@ -19,9 +19,9 @@ drop table supplier cascade constraints;
 drop table includes cascade constraints;
 drop table serves cascade constraints;
 drop table makes cascade constraints;
-drop table orders cascade constraints;
 drop table stocks cascade constraints;
 drop table supplies cascade constraints;
+drop table purchase cascade constraints;
 
 -- Now, add each table.
 
@@ -101,7 +101,14 @@ create table supplier(
 	supplierName varchar2(50)
 	);
 	
-create table includes(	saleID number(8,0),	dishID number(4,0),	quantity number (4,0),	primary key (saleID,dishID),	foreign key (saleID) references sale on delete cascade,foreign key (dishID) references dish on delete cascade);
+create table includes(	
+	saleID number(8,0),	
+	dishID number(4,0),	
+	quantity number (4,0),	
+	primary key (saleID,dishID),	
+	foreign key (saleID) references sale on delete cascade,
+	foreign key (dishID) references dish on delete cascade
+	);
 
 create table serves (	
 	dishID number (4,0),	
@@ -120,18 +127,18 @@ create table makes (
 	);
 
 create table supplies (
-	orderID number (6,0) primary key,
+	purchaseID number (6,0) primary key,
 	supplierID number(5,0),
 	supplyID number(6,0),
 	foreign key (supplierID) references supplier on delete cascade,
 	foreign key (supplyID) references supply on delete cascade
 	);
 
-create table orders (
-	orderID number (6,0) primary key,
+create table purchase (
+	purchaseID number (6,0) primary key,
 	restaurantPhone number (10,0),
 	foreign key (restaurantPhone) references restaurant on delete cascade,
-	foreign key (orderID) references supplies on delete cascade
+	foreign key (purchaseID) references supplies on delete cascade
 	);
 
 create table stocks (
@@ -143,7 +150,7 @@ create table stocks (
 	foreign key (restaurantPhone) references restaurant on delete cascade,
 	foreign key (supplyID) references supply on delete cascade
 	);
-
+	
 	
 -- done adding all of the tables, now add in some tuples
 --  first, add in the restaurant members 'meberID-mName-mphone#-mAddress-mdiscount'
@@ -650,7 +657,7 @@ insert into makes values(6049700900,10000006);
 insert into makes values(6049700900,10000007);
 
 
---now add in supplies 'orderID - supplier ID - supply ID'
+--now add in supplies 'purchaseID - supplier ID - supply ID'
 insert into supplies values(200001,10010,100001);
 insert into supplies values(200002,10002,100002);
 insert into supplies values(200003,10002,100003);
@@ -674,27 +681,27 @@ insert into supplies values(200019,10010,100019);
 insert into supplies values(200020,10003,100020);
 
 
---now add in orders 'orderID - restaurantPhone'
-insert into orders values(200001,7785688999);
-insert into orders values(200002,7785688999);
-insert into orders values(200003,7785688999);
-insert into orders values(200004,7785688999);
-insert into orders values(200005,7785688999);
-insert into orders values(200006,6049566944);
-insert into orders values(200007,6049566944);
-insert into orders values(200008,6049566944);
-insert into orders values(200009,6049566944);
-insert into orders values(200010,6049566944);
-insert into orders values(200011,6042677899);
-insert into orders values(200012,6042677899);
-insert into orders values(200013,6042677899);
-insert into orders values(200014,6042677899);
-insert into orders values(200015,6042677899);
-insert into orders values(200016,6049700900);
-insert into orders values(200017,6049700900);
-insert into orders values(200018,6049700900);
-insert into orders values(200019,6049700900);
-insert into orders values(200020,6049700900);
+--now add in purchase 'purchaseID - restaurantPhone'
+insert into purchase values(200001,7785688999);
+insert into purchase values(200002,7785688999);
+insert into purchase values(200003,7785688999);
+insert into purchase values(200004,7785688999);
+insert into purchase values(200005,7785688999);
+insert into purchase values(200006,6049566944);
+insert into purchase values(200007,6049566944);
+insert into purchase values(200008,6049566944);
+insert into purchase values(200009,6049566944);
+insert into purchase values(200010,6049566944);
+insert into purchase values(200011,6042677899);
+insert into purchase values(200012,6042677899);
+insert into purchase values(200013,6042677899);
+insert into purchase values(200014,6042677899);
+insert into purchase values(200015,6042677899);
+insert into purchase values(200016,6049700900);
+insert into purchase values(200017,6049700900);
+insert into purchase values(200018,6049700900);
+insert into purchase values(200019,6049700900);
+insert into purchase values(200020,6049700900);
 
 
 --now add in stocks 'restaurantPhone - supplyID - quantity - units'
