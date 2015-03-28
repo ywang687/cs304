@@ -96,7 +96,7 @@
 				$result = executePlainSQL("select * from member");
 			
 				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<tr><td>ID</td><td>Name</td><td>Phone</td><td>Address</td><td>Discount Rate</td></tr>";
+				$toDisplay = $toDisplay."<tr><td>ID</td><td>Name</td><td>Phone</td><td>Address</td><td>Discount Rate</td></tr></thead>";
 			
 			
 				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
@@ -307,8 +307,18 @@
 			<input type="text" name="restaurantLocation" size="6" placeholder="Address">
 			<input type="submit" value="Add Restaurant" name="addRestaurant">
 		</form>
+		<div id="restaurantDisplay"></div> <!-- Restaurant display area-->
+		
+		<form method="POST"> <!-- Restaurant Name Edit form-->
+		
+			<input type="text" name="restaurantName_old" size="6" placeholder="Original Name">
+			<input type="text" name="restaurantName_new" size="6" placeholder="New Name">
+			<input type="submit" value="Update Name" name="changeRestaurantName">
+		</form>
+		<div id="restaurantPhoneChangeDisplay"></div> <!-- Restaurant display area-->
+		
 		<?php
-			function generateRestaurantDisplay() {
+			function generateRestaurantDisplay() { ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				$toDisplay = "";
 				$result = executePlainSQL("select * from restaurant");
 			
@@ -328,7 +338,16 @@
 				return $toDisplay;
 			}
 		?>
-		<div id="restaurantDisplay"></div> <!-- Restaurant display area-->
+		<?php
+			$restaurantNameUpdateResult = "";
+			function generateRestaurantNameUpdateDisplay($oldName, $newName) {
+				$toDisplay = "";
+				executePlainSQL("UPDATE restaurant SET restaurantName='".$newName."' WHERE restaurantName='".$oldName."'");
+				
+				$restaurantNameUpdateResult = "Done";
+			}
+		?>
+		
 	</div>
 	
 		<!--TPworks-->
@@ -404,7 +423,7 @@
 
 	<!--Sale-->
 	<div id="tab-Sale">
-		<form method="POST"> <!-- Restaurant form-->
+		<form method="POST"> <!-- Sale form-->
 		
 			<input type="text" name="saleID" size="6" placeholder="sale ID">
 			<input type="text" name="paymentMethod" size="6" placeholder="payment method">
@@ -417,13 +436,14 @@
 				$result = executePlainSQL("select * from sale");
 			
 				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<tr><td>sale ID</td><td>payment method</td><td>discount rate</td></tr>";
+				$toDisplay = $toDisplay."<tr><td>sale ID</td><td>payment method</td><td>subtotal</td><td>discount rate</td></tr>";
 			
 			
 				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 					$toDisplay = $toDisplay."<tr>";
 					$toDisplay = $toDisplay."<td>".$row["SALEID"]."</td>";
 					$toDisplay = $toDisplay."<td>".$row["PAYMENTMETHOD"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["SUBTOTAL"]."</td>";
 					$toDisplay = $toDisplay."<td>".$row["DISCOUNT"]."</td>";
 					$toDisplay = $toDisplay."</tr>";
 				}
@@ -583,14 +603,14 @@
 				
 				// Create new table...
 				executePlainSQL("create table member (memberID number, memberName varchar2(30), memberPhone number, memberAddress char(60), memberDiscount number, primary key (memberID))");
-				executePlainSQL("create table restaurant (restaurantPhone number, restaurantName varchar2(30), restaurantLocation char(60), primary key (restaurantPhone))");
+				executePlainSQL("create table restaurant (restaurantPhone number, restaurantName varchar2(30), restaurantLocation char(60), primary key (restaurantPhone), unique (restaurantName))");
 				executePlainSQL("create table dish (dishID number, dishName varchar2(50), dishStyle varchar2(20), dishPrice number, primary key(dishID))");
 				executePlainSQL("create table employee (employeeID number, empName varchar2(30), empPosition varchar2(20), empSalary number,  primary key(employeeID))");
 				executePlainSQL("create table TPworks (employeeID number, startDate varchar2(10), endDate varchar2(10),  primary key(employeeID),foreign key (employeeID) references employee)");				
 				executePlainSQL("create table employs (restaurantPhone number, employeeID number, startDate varchar2(10), primary key(restaurantPhone,employeeID),foreign key (restaurantPhone) references restaurant, foreign key(employeeID) references TPworks)");
  				executePlainSQL("create table likes (memberID number, dishID number, primary key (memberID, dishID), foreign key(memberID) references member on delete cascade, foreign key (dishID) references dish)");
 				executePlainSQL("create table registered (memberID number, restaurantPhone number, primary key (memberID, restaurantPhone), foreign key (memberID) references member on delete cascade, foreign key (restaurantPhone) references restaurant)");
-				executePlainSQL("create table sale (saleID number, paymentMethod varchar2(10), discount number, primary key(saleID))");
+				executePlainSQL("create table sale (saleID number, paymentMethod varchar2(10), discount number, subtotal number ,primary key(saleID))");
 				executePlainSQL("create table supply (supplyID number, supplyName varchar2(20), primary key (supplyID))");
 				executePlainSQL("create table supplier (supplierID number, supplierName varchar2(50), primary key (supplierID))");
 			
@@ -660,6 +680,9 @@
 				);
 				executeBoundSQL("insert into restaurant values (:bind1, :bind2, :bind3)", $alltuples);
 				OCICommit($db_conn);
+			} elseif (array_key_exists('changeRestaurantName', $_POST)){ //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				$restaurantNameUpdateResult = generateRestaurantNameUpdateDisplay($_POST['restaurantName_old'],$_POST['restaurantName_new']);
+				OCICommit($db_conn);
 			} elseif (array_key_exists('addTPworks', $_POST)){
 				$tuple = array ( //generate a new tuple
 					":bind1" => $_POST['employeeID'],
@@ -727,7 +750,7 @@
 		$("#dishDisplay").html("<?php echo generateDishDisplay(); ?>");
 		$("#TPworksDisplay").html("<?php echo generateTPworksDisplay(); ?>");
 		$("#EmployeeDisplay").html("<?php echo generateEmployeeDisplay(); ?>");
-		$("#SaleDisplay").html("<?php echo generateSaleDisplay(); ?>");
+		$("#saleDisplay").html("<?php echo generateSaleDisplay(); ?>");
 		$("#SupplyDisplay").html("<?php echo generateSupplyDisplay(); ?>");
 		$("#SupplierDisplay").html("<?php echo generateSupplierDisplay(); ?>");
 		$("#likesDisplay").html("<?php echo generateLikesDisplay(); ?>");
