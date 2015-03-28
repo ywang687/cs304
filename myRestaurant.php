@@ -278,6 +278,7 @@
 			<input type="text" name="dishPrice" size="6" placeholder="dPrice">
 			<input type="submit" value="Add Dish" name="addDish">
 		</form>
+		<div id="dishDisplay"></div> <!-- Dish display area-->
 		<?php
 			function generateDishDisplay() {
 				$toDisplay = "";
@@ -300,55 +301,53 @@
 				return $toDisplay;
 			}
 		?>
+		
+		<strong>Find Max/Min average price among Dish Styles</strong><br />
+		<form method="POST"> <!-- Dish sort form -->
+			<input type="radio" name="dishExtremaOption"
+				<?php if (isset($dishExtremaOption) && $dishExtremaOption=="MAX") echo "checked";?>
+				value="MAX" checked>Maximum
+			<input type="radio" name="dishExtremaOption"
+				<?php if (isset($dishExtremaOption) && $dishExtremaOption=="MIN") echo "checked";?>
+				value="MIN">Minimum
+			<br />
+			<input type="submit" value="Sort" name="get_extrema_dish_average">
+			
+		</form>
+		<div id="dishExtremaDisplay"></div> <!-- dish Extrema display area-->
 
 		<?php
-			function generateMaximumAveragePriceDisplay(){
-				$toDisplay = "";
-				$result = executePlainSQL("SELECT dishStyle, AVG(dishPrice) as dishPrice FROM dish GROUP BY dishStyle ORDER BY dishPrice DESC");
-				
+			function generateDishStyleAverageDisplay() {
+				$toDisplay = "<strong>Dish style with the ";
+				$query = "SELECT Temp.dishStyle, Temp.avgPrice FROM (SELECT D.dishStyle, AVG(D.dishPrice) as avgPrice FROM dish D GROUP BY D.dishStyle) AS Temp WHERE Temp.avgPrice = (SELECT ";
+				if($_POST['dishExtremaOption'] == 'MIN'){
+					$query=$query."MIN";
+					$toDisplay = $toDisplay."lowest";
+				} else { //($_POST['dishExtremaOption'] == 'MAX')
+					$query=$query."MAX";
+					$toDisplay = $toDisplay."highest";
+				}
+				$toDisplay = $toDisplay." average price:</strong><br/>";
+				$query=$query."(Temp.avgPrice) FROM Temp)";
+				$result = executePlainSQL($query);
+
 				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<thead><tr><th>Dish Style</th><th>Average Dish Price</th></tr></thead><tbody>";
-				
+				$toDisplay = $toDisplay."<thead><tr><th>Dish Style</th><th>Average Price</th></tr></thead>";
+			
+			
 				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<tbody><tr>";
 					$toDisplay = $toDisplay."<td>".$row["DISHSTYLE"]."</td>";
 					$toDisplay = $toDisplay."<td>".$row["DISHPRICE"]."</td>";
-					$toDisplay = $toDisplay."</tr>";
+					$toDisplay = $toDisplay."</tr></tbody>";
 				}
 				$toDisplay = $toDisplay."</table>";
 			
 				return $toDisplay;
 			}
 		?>
-
-		<?php
-			function generateMinimumAveragePriceDisplay(){
-				$toDisplay = "";
-				$result = executePlainSQL("SELECT dishStyle, AVG(dishPrice) as dishPrice FROM dish GROUP BY dishStyle ORDER BY dishPrice ASC");
-				
-				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<thead><tr><th>Dish Style</th><th>Average Dish Price</th></tr></thead><tbody>";
-				
-				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-					$toDisplay = $toDisplay."<tr>";
-					$toDisplay = $toDisplay."<td>".$row["DISHSTYLE"]."</td>";
-					$toDisplay = $toDisplay."<td>".$row["DISHPRICE"]."</td>";
-					$toDisplay = $toDisplay."</tr>";
-				}
-				$toDisplay = $toDisplay."</table>";
-			
-				return $toDisplay;
-			}
-		?>
-		<div id="dishDisplay"></div> <!-- Dish display area-->
-		<br />
-		<strong>Dish style by (descending) average price</strong>
-		<div id="dishMaximumAverageDisplay"></div> <!-- Dish display area-->
-		<br />
-		<strong>Dish style by (ascending) average price</strong>
-		<div id="dishMinimumAverageDisplay"></div> <!-- Dish display area-->
 	</div>
-	
+	<!-- end Dish -->
 	
 	<!--Restaurant-->
 	<div id="tab-Restaurant">
@@ -997,6 +996,9 @@
 				);
 				executeBoundSQL("insert into dish values (:bind1, :bind2, :bind3, :bind4)", $alltuples);
 				OCICommit($db_conn);
+			} elseif (array_key_exists('get_extrema_dish_average', $_POST)) { //If addMember button clicked
+				$dishExtremaResult = generateDishStyleAverageDisplay();
+				
 			} elseif (array_key_exists('addRestaurant', $_POST)){
 				$tuple = array ( //generate a new tuple
 					":bind1" => $_POST['restaurantPhone'],
@@ -1147,8 +1149,7 @@
 		$("#memberDisplay").html("<?php echo generateMemberDisplay(); ?>");
 		$("#restaurantDisplay").html("<?php echo generateRestaurantDisplay(); ?>");
 		$("#dishDisplay").html("<?php echo generateDishDisplay(); ?>");
-		$("#dishMinimumAverageDisplay").html("<?php echo generateMinimumAveragePriceDisplay(); ?>");
-		$("#dishMaximumAverageDisplay").html("<?php echo generateMaximumAveragePriceDisplay(); ?>");
+		$("#dishExtremaDisplay").html("<?php echo $dishExtremaResult; ?>");
 		$("#TPworksDisplay").html("<?php echo generateTPworksDisplay(); ?>");
 		$("#EmployeeDisplay").html("<?php echo generateEmployeeDisplay(); ?>");
 		$("#saleDisplay").html("<?php echo generateSaleDisplay(); ?>");
