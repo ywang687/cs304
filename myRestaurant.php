@@ -300,6 +300,7 @@
 	
 	<!--Restaurant-->
 	<div id="tab-Restaurant">
+		<b>Add Restaurant</b>
 		<form method="POST"> <!-- Restaurant form-->
 		
 			<input type="text" name="restaurantPhone" size="6" placeholder="Phone #">
@@ -307,15 +308,21 @@
 			<input type="text" name="restaurantLocation" size="6" placeholder="Address">
 			<input type="submit" value="Add Restaurant" name="addRestaurant">
 		</form>
-		<div id="restaurantDisplay"></div> <!-- Restaurant display area-->
 		
+		<br />
+		<b>Edit Restaurant Name</b>
 		<form method="POST"> <!-- Restaurant Name Edit form-->
 		
 			<input type="text" name="restaurantName_old" size="6" placeholder="Original Name">
 			<input type="text" name="restaurantName_new" size="6" placeholder="New Name">
 			<input type="submit" value="Update Name" name="changeRestaurantName">
 		</form>
-		<div id="restaurantPhoneChangeDisplay"></div> <!-- Restaurant display area-->
+		<div id="restaurantNameChangeDisplay"></div> <!-- Restaurant display area-->
+		
+		<br />
+		<div id="restaurantDisplay"></div> <!-- Restaurant display area-->
+		
+		
 		
 		<?php
 			function generateRestaurantDisplay() { ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -344,7 +351,9 @@
 				$toDisplay = "";
 				executePlainSQL("UPDATE restaurant SET restaurantName='".$newName."' WHERE restaurantName='".$oldName."'");
 				
-				$restaurantNameUpdateResult = "Done";
+				//$restaurantNameUpdateResult = "Name Change Done";
+				
+				return $restaurantNameUpdateResult;
 			}
 		?>
 		
@@ -756,6 +765,7 @@
 		$("#likesDisplay").html("<?php echo generateLikesDisplay(); ?>");
 		$("#registeredDisplay").html("<?php echo generateRegisteredDisplay(); ?>");
 		$("#memberSearchDisplay").html("<?php echo $memberSearchResult; ?>");
+		$("#restaurantNameChangeDisplay").html("<?php echo $restaurantNameUpdateResult; ?>");
 		$("#likesJoinedDisplay").html("<?php echo generateJoinedLikesDisplay(); ?>");
 		
 	</script>
