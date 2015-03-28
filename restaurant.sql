@@ -29,7 +29,8 @@ create table member(
 create table restaurant(
 	restaurantPhone number(10,0) primary key,
 	restaurantName varchar2(30),
-	restaurantLocation char(70)
+	restaurantLocation char(70),
+	unique (restaurantName)
 	);
 create table dish( dishID number(4,0) primary key, 	
 	dishName varchar2(50), 	
