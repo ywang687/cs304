@@ -14,8 +14,8 @@
 		</script>
 		<?php 
 			// Database log-in information
-			$databaseUserName="ora_u0j8";
-			$databasePassword="a45777109";
+			$databaseUserName="ora_z6j7";
+			$databasePassword="a72495096";
 			
 			$success = True; //keep track of errors so it redirects the page only if there are no errors
 			$db_conn = OCILogon($databaseUserName, $databasePassword, "ug");
@@ -199,13 +199,13 @@
 				$result = executePlainSQL("select * from likes");
 				
 				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<tr><td>Member ID</td><td>Dish ID</td></tr>";
+				$toDisplay = $toDisplay."<thead><tr><th>Member ID</th><th>Dish ID</th></tr></thead>";
 				
 				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<tbody><tr>";
 					$toDisplay = $toDisplay."<td>".$row["MEMBERID"]."</td>";
 					$toDisplay = $toDisplay."<td>".$row["DISHID"]."</td>";
-					$toDisplay = $toDisplay."</tr>";
+					$toDisplay = $toDisplay."</tbody></tr>";
 				}
 				$toDisplay = $toDisplay."</table>";
 			
@@ -284,13 +284,53 @@
 				$result = executePlainSQL("select * from dish");
 			
 				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<tr><td>Dish ID</td><td>Dish Name</td><td>Style</td><td>Price</td></tr>";
+				$toDisplay = $toDisplay."<thead><tr><th>Dish ID</th><th>Dish Name</th><th>Style</th><th>Price</th></tr></thead>";
 			
 			
 				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<tbody><tr>";
 					$toDisplay = $toDisplay."<td>".$row["DISHID"]."</td>";
 					$toDisplay = $toDisplay."<td>".$row["DISHNAME"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["DISHSTYLE"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["DISHPRICE"]."</td>";
+					$toDisplay = $toDisplay."</tr></tbody>";
+				}
+				$toDisplay = $toDisplay."</table>";
+			
+				return $toDisplay;
+			}
+		?>
+
+		<?php
+			function generateMaximumAveragePriceDisplay(){
+				$toDisplay = "";
+				$result = executePlainSQL("SELECT dishStyle, AVG(dishPrice) as dishPrice FROM dish GROUP BY dishStyle ORDER BY dishPrice DESC");
+				
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<thead><tr><th>Dish Style</th><th>Average Dish Price</th></tr></thead><tbody>";
+				
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<td>".$row["DISHSTYLE"]."</td>";
+					$toDisplay = $toDisplay."<td>".$row["DISHPRICE"]."</td>";
+					$toDisplay = $toDisplay."</tr>";
+				}
+				$toDisplay = $toDisplay."</table>";
+			
+				return $toDisplay;
+			}
+		?>
+
+		<?php
+			function generateMinimumAveragePriceDisplay(){
+				$toDisplay = "";
+				$result = executePlainSQL("SELECT dishStyle, AVG(dishPrice) as dishPrice FROM dish GROUP BY dishStyle ORDER BY dishPrice ASC");
+				
+				$toDisplay = $toDisplay."<table border='1' width='100%'>";
+				$toDisplay = $toDisplay."<thead><tr><th>Dish Style</th><th>Average Dish Price</th></tr></thead><tbody>";
+				
+				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+					$toDisplay = $toDisplay."<tr>";
 					$toDisplay = $toDisplay."<td>".$row["DISHSTYLE"]."</td>";
 					$toDisplay = $toDisplay."<td>".$row["DISHPRICE"]."</td>";
 					$toDisplay = $toDisplay."</tr>";
@@ -301,6 +341,12 @@
 			}
 		?>
 		<div id="dishDisplay"></div> <!-- Dish display area-->
+		<br />
+		<strong>Dish style by (descending) average price</strong>
+		<div id="dishMaximumAverageDisplay"></div> <!-- Dish display area-->
+		<br />
+		<strong>Dish style by (ascending) average price</strong>
+		<div id="dishMinimumAverageDisplay"></div> <!-- Dish display area-->
 	</div>
 	
 	
@@ -483,16 +529,16 @@
 				$result = executePlainSQL("select * from supply");
 			
 				$toDisplay = $toDisplay."<table border='1' width='100%'>";
-				$toDisplay = $toDisplay."<thead><tr><th>Supply ID</th><th>Supply Name</th></tr></thead><tbody>";
+				$toDisplay = $toDisplay."<thead><tr><th>Supply ID</th><th>Supply Name</th></tr></thead>";
 			
 			
 				while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-					$toDisplay = $toDisplay."<tr>";
+					$toDisplay = $toDisplay."<tbody><tr>";
 					$toDisplay = $toDisplay."<td>".$row["SUPPLYID"]."</td>";
 					$toDisplay = $toDisplay."<td>".$row["SUPPLYNAME"]."</td>";
-					$toDisplay = $toDisplay."</tr>";
+					$toDisplay = $toDisplay."</tr></tbody>";
 				}
-				$toDisplay = $toDisplay."</tbody></table>";
+				$toDisplay = $toDisplay."</table>";
 			
 				return $toDisplay;
 			}
@@ -1035,15 +1081,7 @@
 				executeBoundSQL("insert into stocks values (:bind1, :bind2, :bind3, :bind4)", $alltuples);
 				OCICommit($db_conn);
       			} elseif (array_key_exists('update_stock', $_POST)) { //If addMember button clicked
-				$tuple = array ( //generate a new tuple
-					":bind2" => $_POST['supplyID_update'],
-					":bind1" => $_POST['update_quantity']
-
-				);
-				$alltuples = array ( //wrap the tuple into an array
-					$tuple
-				);
-				executePlainSQL("UPDATE stocks ST SET ST.quantity=:bind1 where ST.supplyID=:bind2", $alltuples);
+				executePlainSQL("UPDATE stocks SET quantity=".$_POST['update_quantity']." where supplyID=".$_POST['supplyID_update']);
 				OCICommit($db_conn);
 			} elseif (array_key_exists('addSupplies', $_POST)) { //If addSupplies button clicked
 				$tuple = array ( //generate a new tuple
@@ -1077,6 +1115,8 @@
 		$("#memberDisplay").html("<?php echo generateMemberDisplay(); ?>");
 		$("#restaurantDisplay").html("<?php echo generateRestaurantDisplay(); ?>");
 		$("#dishDisplay").html("<?php echo generateDishDisplay(); ?>");
+		$("#dishMinimumAverageDisplay").html("<?php echo generateMinimumAveragePriceDisplay(); ?>");
+		$("#dishMaximumAverageDisplay").html("<?php echo generateMaximumAveragePriceDisplay(); ?>");
 		$("#TPworksDisplay").html("<?php echo generateTPworksDisplay(); ?>");
 		$("#EmployeeDisplay").html("<?php echo generateEmployeeDisplay(); ?>");
 		$("#saleDisplay").html("<?php echo generateSaleDisplay(); ?>");
